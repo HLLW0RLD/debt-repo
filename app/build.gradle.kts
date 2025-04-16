@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.debtdiary"
+    namespace = "com.example.debt"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.debtdiary"
+        applicationId = "com.example.debt"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
