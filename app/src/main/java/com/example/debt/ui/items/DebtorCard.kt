@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -73,8 +75,10 @@ fun DebtorCard(
 
             Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .clickable { showHistory = !showHistory },
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
                 Text(
                     text = "Долг: ${debtor.debtAmount} ₽",
@@ -93,20 +97,29 @@ fun DebtorCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             AnimatedVisibility(visible = showHistory) {
-                LazyColumn(
+                val height = 70 + (40 * debtor.transactions.size)
+                    LazyColumn(
                     state = scrollState,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
+                        .height(height.dp)
                         .padding(8.dp),
                 ) {
                     items(debtor.transactions.size) { transactionInd ->
                         val transaction = debtor.transactions[debtor.transactions.size - 1 - transactionInd]
                         Text(
-                            text = "${transaction.type.v} : ${transaction.amount} ₽",
+                            text = "${transaction.type.v.uppercase()} - ${debtor.loanDate}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "${transaction.amount} ₽",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Divider(Modifier.fillMaxWidth())
+                        Spacer(modifier = Modifier.height(6.dp))
                     }
                 }
             }
