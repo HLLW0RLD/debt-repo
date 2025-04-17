@@ -1,4 +1,4 @@
-package com.example.debt.ui.debt.items
+package com.example.debt.ui.items
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

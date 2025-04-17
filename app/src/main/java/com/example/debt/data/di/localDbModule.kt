@@ -1,6 +1,6 @@
 package com.example.debt.app.data.di
 
-import com.example.debt.app.data.db.AppDatabase
+import com.example.debt.data.db.AppDatabase
 import org.koin.dsl.module
 
 val localDbModule = module {

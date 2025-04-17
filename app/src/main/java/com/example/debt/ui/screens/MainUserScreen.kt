@@ -1,11 +1,8 @@
 package com.example.debt.app.ui.screens
 
-import android.widget.ImageButton
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,10 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,7 +39,8 @@ import androidx.compose.ui.unit.sp
 import com.example.debt.R
 import com.example.debt.app.data.Debtor
 import com.example.debt.app.ui.items.DebtorCard
-import com.example.debt.ui.debt.items.PaymentDialog
+import com.example.debt.app.ui.items.DebtorForm
+import com.example.debt.ui.items.PaymentDialog
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -132,60 +128,12 @@ fun MainUserScreen() {
                 onDismissRequest = { showBottomSheet = false },
                 sheetState = rememberModalBottomSheetState()
             ) {
-                // Содержимое BottomSheet
-                var name by remember { mutableStateOf("") }
-                var amount by remember { mutableStateOf("") }
-                var comment by remember { mutableStateOf("") }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    TextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Имя должника") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    TextField(
-                        value = amount,
-                        onValueChange = { amount = it },
-                        label = { Text("Сумма долга") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    TextField(
-                        value = comment,
-                        onValueChange = { comment = it },
-                        label = { Text("Комментарий") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
-                            val newDebtor = Debtor(
-                                telegramNick = name,
-                                debtAmount = amount.toDoubleOrNull() ?: 0.0,
-                                comment = comment,
-                            )
-                            viewModel.insert(newDebtor)
-                            showBottomSheet = false
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = name.isNotBlank() && amount.toDoubleOrNull() != null
-                    ) {
-                        Text("Добавить")
-                    }
-                }
+               DebtorForm(
+                   onSaveComplete = {
+                       viewModel.insert(it)
+                       showBottomSheet = false
+                   }
+               )
             }
         }
     }

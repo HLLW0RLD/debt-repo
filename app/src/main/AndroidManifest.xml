@@ -14,7 +14,7 @@
         android:theme="@style/Theme.DebtDiary"
         tools:targetApi="31">
         <activity
-            android:name=".ui.debt.screens.MainActivity"
+            android:name=".ui.screens.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.DebtDiary">

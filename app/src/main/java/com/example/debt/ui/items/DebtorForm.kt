@@ -13,8 +13,7 @@ import java.util.*
 
 @Composable
 fun DebtorForm(
-    viewModel: DebtorViewModel,
-    onSaveComplete: () -> Unit
+    onSaveComplete: (Debtor) -> Unit
 ) {
     var telegramNick by remember { mutableStateOf("") }
     var debtAmount by remember { mutableStateOf("") }
@@ -65,9 +64,7 @@ fun DebtorForm(
                     returnDate = returnDate,
                     comment = comment.ifEmpty { null }
                 )
-
-                viewModel.insert(debtor)
-                onSaveComplete()
+                onSaveComplete(debtor)
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = telegramNick.isNotBlank() && debtAmount.toDoubleOrNull() != null

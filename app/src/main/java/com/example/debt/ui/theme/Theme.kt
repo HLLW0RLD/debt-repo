@@ -1,4 +1,4 @@
-package com.example.debt.ui.debt
+package com.example.debt.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

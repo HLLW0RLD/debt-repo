@@ -3,6 +3,7 @@ package com.example.debt.utils
 import android.widget.Toast
 import com.example.debt.App
 import java.text.SimpleDateFormat
+import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -25,8 +26,8 @@ fun getCurrentDate(): String {
 }
 
 fun getCurrentDateTime(): String {
-    val dateFormat = SimpleDateFormat("HH:mm:ss dd.MM.yyyy", Locale.getDefault())
-    dateFormat.timeZone = TimeZone.getDefault()
+    val dateFormat = SimpleDateFormat("HH:mm:ss dd.MM.yyyy")
+    dateFormat.timeZone = TimeZone.getTimeZone(ZoneId.systemDefault())
     val date = Date()
     return dateFormat
         .format(date)

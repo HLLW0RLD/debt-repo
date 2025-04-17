@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.1"
+agp = "8.8.2"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -13,9 +13,6 @@ koin = "3.5.0"
 koinCore = "3.5.0"
 gson = "2.13.0"
 gsonParent = "2.13.0"
-roomRuntime = "2.7.0"
-roomKtx = "2.7.0"
-roomCompiler = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,8 +34,6 @@ gson-parent = { group = "com.google.code.gson", name = "gson-parent", version.re
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koinCore" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin"}
-androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
-androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
