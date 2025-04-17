@@ -1,6 +1,6 @@
 package com.example.debt.app.data.repo
 
-import com.example.debt.app.data.Debtor
+import com.example.debt.data.model.Debtor
 import com.example.debt.app.data.db.DebtorDao
 import kotlinx.coroutines.flow.Flow
 
@@ -17,11 +17,13 @@ class LocalRepositoryImpl(private val debtorDao: DebtorDao): LocalRepository {
     }
 
     override suspend fun addDebt(debtorId: Long, newAmount: Double) {
-        debtorDao.addDebt(debtorId, newAmount)
+        val debtor = debtorDao.getDebtorById(debtorId) ?: return
+        debtorDao.updateDebt(debtor.addDebt(newAmount))
     }
 
     override suspend fun payDebt(debtorId: Long, newAmount: Double) {
-        debtorDao.payDebt(debtorId, newAmount)
+        val debtor = debtorDao.getDebtorById(debtorId) ?: return
+        debtorDao.updateDebt(debtor.addPayment(newAmount))
     }
 
     override suspend fun getDebtorById(id: Long): Debtor? {

@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.debt.R
-import com.example.debt.app.data.Debtor
+import com.example.debt.data.model.Debtor
 import com.example.debt.app.ui.items.DebtorCard
 import com.example.debt.app.ui.items.DebtorForm
 import com.example.debt.ui.items.PaymentDialog

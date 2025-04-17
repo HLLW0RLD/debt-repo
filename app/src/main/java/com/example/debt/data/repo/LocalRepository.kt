@@ -1,6 +1,6 @@
 package com.example.debt.app.data.repo
 
-import com.example.debt.app.data.Debtor
+import com.example.debt.data.model.Debtor
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 
