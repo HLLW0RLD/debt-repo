@@ -6,7 +6,7 @@ import com.example.debt.app.data.repo.LocalRepositoryImpl
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single<LocalRepositoryImpl> {
+    single<LocalRepository> {
         val db = get<AppDatabase>()
 
         LocalRepositoryImpl(

@@ -2,8 +2,7 @@ package com.example.debt.app.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.debtdiary.utils.getCurrentDateTime
-import java.util.Date
+import com.example.debt.utils.getCurrentDateTime
 
 @Entity(tableName = "debtors")
 data class Debtor(

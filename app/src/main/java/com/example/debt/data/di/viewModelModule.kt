@@ -1,4 +1,4 @@
-package com.example.debtdiary.data.di
+package com.example.debt.data.di
 
 
 import com.example.debt.app.ui.screens.DebtorViewModel

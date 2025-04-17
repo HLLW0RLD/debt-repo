@@ -1,4 +1,4 @@
-package com.example.debtdiary.ui.debt
+package com.example.debt.ui.debt
 
 import androidx.compose.ui.graphics.Color
 

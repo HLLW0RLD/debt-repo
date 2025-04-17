@@ -1,10 +1,11 @@
-package com.example.debtdiary.utils
+package com.example.debt.utils
 
 import android.widget.Toast
-import com.example.debtdiary.App
+import com.example.debt.App
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 val LENGTH_LONG = Toast.LENGTH_LONG
 val LENGTH_SHORT = Toast.LENGTH_SHORT
@@ -24,9 +25,11 @@ fun getCurrentDate(): String {
 }
 
 fun getCurrentDateTime(): String {
-    val dateFormat = SimpleDateFormat("yyyy_MM_dd_HH.mm.ss", Locale.getDefault())
+    val dateFormat = SimpleDateFormat("HH:mm:ss dd.MM.yyyy", Locale.getDefault())
+    dateFormat.timeZone = TimeZone.getDefault()
     val date = Date()
-    return dateFormat.format(date)
+    return dateFormat
+        .format(date)
 }
 
 fun String.capitalizeFirstLetter(): String {

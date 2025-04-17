@@ -1,9 +1,9 @@
-package com.example.debtdiary
+package com.example.debt
 
 import android.app.Application
 import com.example.debt.app.data.di.localDbModule
 import com.example.debt.app.data.di.repositoryModule
-import com.example.debtdiary.data.di.viewModelModule
+import com.example.debt.data.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -15,9 +15,9 @@ class App : Application() {
         startKoin {
             androidContext(this@App.baseContext)
             modules(
-                localDbModule,
+                viewModelModule,
                 repositoryModule,
-                viewModelModule
+                localDbModule
             )
         }.koin
 

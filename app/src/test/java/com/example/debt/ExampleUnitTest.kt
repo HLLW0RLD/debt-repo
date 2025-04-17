@@ -1,4 +1,4 @@
-package com.example.debtdiary
+package com.example.debt
 
 import org.junit.Test
 

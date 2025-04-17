@@ -1,18 +1,24 @@
 package com.example.debt.app.ui.items
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,13 +32,11 @@ fun DebtorCard(
     onDebtorClick: () -> Unit,
     onPaymentClick: () -> Unit
 ) {
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { onDebtorClick() },
+            .clickable { onPaymentClick() },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
@@ -54,14 +58,14 @@ fun DebtorCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Дата займа: ${dateFormat.format(debtor.loanDate)}",
+                text = "Дата займа: ${debtor.loanDate}",
                 style = MaterialTheme.typography.bodyMedium
             )
 
             debtor.returnDate?.let { date ->
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Дата возврата: ${dateFormat.format(date)}",
+                    text = "Дата возврата: ${date}",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -77,11 +81,18 @@ fun DebtorCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Button(
-                onClick = onPaymentClick,
-                modifier = Modifier.fillMaxWidth()
+            TextButton(
+                onClick = onDebtorClick,
+                modifier = Modifier
+                    .background(
+                        shape = RoundedCornerShape(20.dp),
+                        color = Color.Red
+                    )
             ) {
-                Text("Внести оплату")
+                Text(
+                    text = "удалить",
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
