@@ -13,16 +13,17 @@ import java.lang.reflect.Type
 data class Debtor(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val name: String,
     val telegramNick: String,
     val debtAmount: Double,
-    val loanDate: String = getCurrentDateTime(),
+    var loanDate: String = getCurrentDateTime(),
     @ColumnInfo(name = "transactions")
-    private val _transactions: String = "",
+    private var _transactions: String = "",
     val returnDate: String? = null, // опционально
     var comment: String? = null // опционально
 ) {
     fun get_transactions(): String = _transactions
-    val transactions: MutableList<Transaction>
+    var transactions: MutableList<Transaction>
         get() = try {
             val type: Type = object : TypeToken<MutableList<Transaction>>() {}.type
             Gson().fromJson(_transactions, type) ?: mutableListOf()
@@ -30,13 +31,16 @@ data class Debtor(
             errorLog(e)
             mutableListOf()
         }
+        set(value) {
+            _transactions = Gson().toJson(value)
+        }
 
     fun addPayment(amount: Double): Debtor {
         val newTransaction = Transaction(
             amount = amount,
             type = TransactionType.PAYMENT,
             id = id,
-            date = loanDate,
+            date = getCurrentDateTime(),
             comment = comment
         )
         val addTransactions = transactions + newTransaction
@@ -51,7 +55,7 @@ data class Debtor(
             amount = amount,
             type = TransactionType.DEBT,
             id = id,
-            date = loanDate,
+            date = getCurrentDateTime(),
             comment = comment
         )
         val updatedTransactions = transactions + newTransaction

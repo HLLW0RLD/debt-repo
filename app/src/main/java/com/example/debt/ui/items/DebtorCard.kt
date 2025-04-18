@@ -38,15 +38,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.debt.data.model.Debtor
+import com.example.debt.data.model.TransactionType
 import com.example.debt.utils.openTelegramChat
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun DebtorCard(
@@ -69,11 +67,13 @@ fun DebtorCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = debtor.telegramNick,
+                text = debtor.name,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
-                    debtor.telegramNick.openTelegramChat()
+                    if (debtor.telegramNick.isNotBlank()) {
+                        debtor.telegramNick.openTelegramChat()
+                    }
                 }
             )
 
@@ -113,17 +113,19 @@ fun DebtorCard(
                         .padding(8.dp),
                 ) {
                     items(debtor.transactions.size) { transactionInd ->
-                        val transaction =
-                            debtor.transactions[debtor.transactions.size - 1 - transactionInd]
+                        val transaction = debtor.transactions[debtor.transactions.size - 1 - transactionInd]
+                        val operator = if (transaction.type == TransactionType.PAYMENT) "+" else "-"
+                        val color = if (transaction.type == TransactionType.PAYMENT) Color.Green else Color.Red
+
                         Text(
-                            text = "${transaction.type.v.uppercase()} - ${debtor.loanDate}",
+                            text = "${transaction.type.v.uppercase()} - ${transaction.date}",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "${transaction.amount} ₽",
+                            text = "$operator ${transaction.amount} ₽",
                             style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
+                            color = color
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Divider(Modifier.fillMaxWidth())

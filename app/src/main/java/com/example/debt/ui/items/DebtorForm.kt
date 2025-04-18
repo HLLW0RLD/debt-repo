@@ -16,6 +16,7 @@ fun DebtorForm(
     onSaveComplete: (Debtor) -> Unit
 ) {
     var telegramNick by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
     var debtAmount by remember { mutableStateOf("") }
     var returnDate by remember { mutableStateOf("") }
     var comment by remember { mutableStateOf("") }
@@ -26,9 +27,16 @@ fun DebtorForm(
             .fillMaxWidth()
     ) {
         OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Имя должника") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
             value = telegramNick,
             onValueChange = { telegramNick = it },
-            label = { Text("Ник в Telegram") },
+            label = { Text("Ник в Telegram (для перехода в приложение)") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -60,6 +68,7 @@ fun DebtorForm(
                 val amount = debtAmount.toDoubleOrNull() ?: 0.0
                 val debtor = Debtor(
                     telegramNick = telegramNick,
+                    name = name,
                     debtAmount = amount,
                     returnDate = returnDate,
                     comment = comment.ifEmpty { null }
@@ -67,7 +76,7 @@ fun DebtorForm(
                 onSaveComplete(debtor)
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = telegramNick.isNotBlank() && debtAmount.toDoubleOrNull() != null
+            enabled = name.isNotBlank() && debtAmount.toDoubleOrNull() != null
         ) {
             Text("Сохранить")
         }

@@ -11,7 +11,7 @@ private const val DB_NAME = "project_debt"
 
 @Database(
     entities = [Debtor::class],
-    version = 2
+    version = 3
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun debtorDao(): DebtorDao

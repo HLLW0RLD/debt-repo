@@ -13,16 +13,16 @@ class DebtorViewModel(private val repository: LocalRepository) : ViewModel(), Ko
     val debtors = repository.debtors
 
     fun insert(debtor: Debtor) = viewModelScope.launch {
+        val initialTransaction = Transaction(
+            amount = debtor.debtAmount,
+            type = TransactionType.DEBT,
+            date = debtor.loanDate,
+            comment = "Первоначальный долг",
+            id = debtor.id
+        )
+        
         debtor.apply {
-            this.comment = comment
-            transactions.add(
-                Transaction(
-                    id = id,
-                    amount = this.debtAmount,
-                    date = this.loanDate,
-                    type = TransactionType.DEBT
-                )
-            )
+            transactions = mutableListOf(initialTransaction)
         }
         repository.insert(debtor)
     }
