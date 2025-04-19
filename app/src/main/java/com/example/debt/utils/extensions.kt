@@ -53,15 +53,10 @@ fun String.openTelegramChat() {
         context.packageManager.getPackageInfo("org.telegram.messenger", 0)
         intent.setPackage("org.telegram.messenger")
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
 
-        try {
-            context.startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            errorLog(e)
-            toast("Telegram не установлен")
-        }
-
-    } catch (e: PackageManager.NameNotFoundException) {
+    } catch (e: Exception) {
+        toast("Telegram не установлен")
         errorLog(e)
     }
 }

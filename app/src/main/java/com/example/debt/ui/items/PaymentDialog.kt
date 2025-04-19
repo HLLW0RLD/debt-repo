@@ -39,7 +39,7 @@ fun PaymentDialog(
         title = { Text(text = "Операция с долгом") },
         text = {
             Column {
-                Text("Должник: ${debtor?.telegramNick.orEmpty()}")
+                Text("Должник: ${debtor?.name.orEmpty()}")
                 Text("Текущий долг: ${debtor?.debtAmount ?: 0}")
 
                 Spacer(Modifier.height(16.dp))
