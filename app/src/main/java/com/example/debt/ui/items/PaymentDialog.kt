@@ -46,7 +46,10 @@ fun PaymentDialog(
 
                 TextField(
                     value = amount,
-                    onValueChange = { amount = it },
+                    onValueChange = { amount = it
+                        amount = it
+                            .trim()
+                            .replace("-", "") },
                     label = { Text("Сумма") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
@@ -61,7 +64,12 @@ fun PaymentDialog(
                             selected = !isAddition,
                             onClick = { isAddition = false }
                         )
-                        Text("Оплата займа", modifier = Modifier.clickable { isAddition = false })
+                        Text("Оплата займа",
+                            modifier = Modifier
+                                .clickable {
+                                    isAddition = false
+                                }
+                        )
                     }
 
                     Spacer(Modifier.width(16.dp))
@@ -70,7 +78,13 @@ fun PaymentDialog(
                             selected = isAddition,
                             onClick = { isAddition = true }
                         )
-                        Text("Новый займ", modifier = Modifier.clickable { isAddition = true })
+                        Text(
+                            "Новый займ",
+                            modifier = Modifier
+                                .clickable {
+                                    isAddition = true
+                                }
+                        )
                     }
                 }
             }

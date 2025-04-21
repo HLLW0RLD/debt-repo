@@ -17,6 +17,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        setProperty("archivesBaseName", "debt vc$versionCode v$versionName")
     }
 
     buildTypes {
@@ -50,6 +52,7 @@ dependencies {
     // Gson
     implementation(libs.gson)
     implementation(libs.gson.parent)
+    implementation(libs.threetenabp)
 
     // Room
     val room_version = "2.6.1"

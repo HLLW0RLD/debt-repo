@@ -1,18 +1,17 @@
 package com.example.debt.utils
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.widget.Toast
+import androidx.compose.ui.graphics.Color
 import com.example.debt.App
 import java.text.SimpleDateFormat
-import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 import androidx.core.net.toUri
 import com.example.debt.app.utils.LogUtils.errorLog
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.ChronoUnit
 
 val LENGTH_LONG = Toast.LENGTH_LONG
 val LENGTH_SHORT = Toast.LENGTH_SHORT
@@ -59,4 +58,30 @@ fun String.openTelegramChat() {
         toast("Telegram не установлен")
         errorLog(e)
     }
+}
+
+fun String.setColorDate(): Color {
+    try {
+        val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+
+        if (!this.matches(Regex("\\d{2}\\.\\d{2}\\.\\d{4}"))) {
+            throw IllegalArgumentException("Дата должна быть в формате dd.MM.yyyy")
+        }
+
+        val inputDate = LocalDate.parse(this, formatter)
+        val currentDate = LocalDate.now()
+
+        val daysDifference = ChronoUnit.DAYS.between(currentDate, inputDate)
+
+        return when {
+            daysDifference > 8 -> Color.Green
+            daysDifference in 3..7 -> Color.Yellow
+            daysDifference in 1..2 -> Color.hsl(35f, 1f, 0.5f)
+            daysDifference == 0L -> Color.Red
+            else -> Color.Red
+        }
+    } catch (e : Exception) {
+        errorLog("string: $this \nerror $e")
+    }
+    return Color.Red
 }
