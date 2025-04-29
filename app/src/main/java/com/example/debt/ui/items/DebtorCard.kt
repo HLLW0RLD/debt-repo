@@ -38,6 +38,7 @@ import com.example.debt.R
 import com.example.debt.data.model.Debtor
 import com.example.debt.data.model.TransactionType
 import com.example.debt.utils.openTelegramChat
+import com.example.debt.utils.setColorDate
 
 @Composable
 fun DebtorCard(
@@ -153,7 +154,8 @@ fun DebtorCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Дата возврата: ${date}",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = date.setColorDate()
                 )
             }
 
