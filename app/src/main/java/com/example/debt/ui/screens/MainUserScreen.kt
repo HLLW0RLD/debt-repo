@@ -1,6 +1,8 @@
 package com.example.debt.app.ui.screens
 
 import android.app.Activity
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,8 +38,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowCompat
 import com.example.debt.R
 import com.example.debt.data.model.Debtor
@@ -48,6 +47,7 @@ import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.SimpleDebtDialog
 import org.koin.androidx.compose.koinViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainUserScreen() {
@@ -59,6 +59,8 @@ fun MainUserScreen() {
     var showPaymentDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedDebtor by remember { mutableStateOf<Debtor?>(null) }
+
+    var editedDebtor by remember { mutableStateOf<Debtor?>(null) }
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -74,11 +76,6 @@ fun MainUserScreen() {
     ) {
         Column {
             Spacer(Modifier.size(45.dp))
-//            Divider(Modifier
-//                .fillMaxWidth()
-//                .height(2.dp)
-//                .background(Color.Black)
-//            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -100,16 +97,21 @@ fun MainUserScreen() {
                     .fillMaxSize()
                     .padding(6.dp,),
             ) {
+                val revDebt = debtors
                 items(debtors.size) { debtor ->
                     DebtorCard(
-                        debtor = debtors[debtor],
+                        debtor = revDebt[debtor],
                         onDeleteDebtorClick = {
-                            selectedDebtor = debtors[debtor]
+                            selectedDebtor = it
                             showDeleteDialog = true
                         },
                         onPaymentClick = {
-                            selectedDebtor = debtors[debtor]
+                            selectedDebtor = it
                             showPaymentDialog = true
+                        },
+                        onEditClick = {
+                            editedDebtor = it
+                            showBottomSheet = true
                         }
                     )
                 }
@@ -166,13 +168,23 @@ fun MainUserScreen() {
 
         if (showBottomSheet) {
             ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
+                onDismissRequest = {
+                    showBottomSheet = false
+                    editedDebtor = null
+                },
                 sheetState = rememberModalBottomSheetState()
             ) {
                DebtorForm(
+                   debtor = editedDebtor,
                    onSaveComplete = {
-                       viewModel.insert(it)
-                       showBottomSheet = false
+                       if (editedDebtor != null) {
+                           viewModel.updateDebt(it)
+                           showBottomSheet = false
+                       } else {
+                           viewModel.insertDebtor(it)
+                           showBottomSheet = false
+                       }
+                       editedDebtor = null
                    }
                )
             }

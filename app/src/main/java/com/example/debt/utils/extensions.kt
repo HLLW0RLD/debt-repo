@@ -60,12 +60,12 @@ fun String.openTelegramChat() {
     }
 }
 
-fun String.setColorDate(): Color {
+fun String.setColorDate(): Color? {
     try {
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
         if (!this.matches(Regex("\\d{2}\\.\\d{2}\\.\\d{4}"))) {
-            return Color.White
+            return null
             throw IllegalArgumentException("Дата должна быть в формате dd.MM.yyyy")
         }
 

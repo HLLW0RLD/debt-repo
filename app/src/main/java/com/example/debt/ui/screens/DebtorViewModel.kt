@@ -12,19 +12,21 @@ import org.koin.core.component.KoinComponent
 class DebtorViewModel(private val repository: LocalRepository) : ViewModel(), KoinComponent {
     val debtors = repository.debtors
 
-    fun insert(debtor: Debtor) = viewModelScope.launch {
-        val initialTransaction = Transaction(
-            amount = debtor.debtAmount,
-            type = TransactionType.DEBT,
-            date = debtor.loanDate,
-            comment = "Первоначальный долг",
-            id = debtor.id
-        )
-        
-        debtor.apply {
-            transactions = mutableListOf(initialTransaction)
+    fun insertDebtor(debtor: Debtor) {
+        viewModelScope.launch {
+            val initialTransaction = Transaction(
+                amount = debtor.debtAmount,
+                type = TransactionType.DEBT,
+                date = debtor.loanDate,
+                comment = "Первоначальный долг",
+                id = debtor.id
+            )
+
+            debtor.apply {
+                transactions = mutableListOf(initialTransaction)
+            }
+            repository.insertDebtor(debtor)
         }
-        repository.insert(debtor)
     }
 
     fun payDebt(debtorId: Long, paymentAmount: Double) {
@@ -40,6 +42,12 @@ class DebtorViewModel(private val repository: LocalRepository) : ViewModel(), Ko
     fun addDebt(debtorId: Long, additionalAmount: Double) {
         viewModelScope.launch {
             repository.addDebt(debtorId, additionalAmount)
+        }
+    }
+
+    fun updateDebt(debtor: Debtor) {
+        viewModelScope.launch {
+            repository.updateDebt(debtor)
         }
     }
 

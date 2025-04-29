@@ -9,6 +9,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -100,7 +101,6 @@ fun DebtorCard(
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .clickable { showHistory = !showHistory },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
@@ -160,19 +160,19 @@ fun DebtorCard(
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            debtor.returnDate?.let { date ->
+            if (debtor.returnDate.setColorDate() != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Дата возврата: ${date}",
+                    text = "Дата возврата: ${debtor.returnDate}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = date.setColorDate()
+                    color = debtor.returnDate.setColorDate() ?: Color.White
                 )
             }
 
-            debtor.comment?.let { comment ->
+            if (debtor.comment.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Комментарий: $comment",
+                    text = "Комментарий: ${debtor.comment}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontStyle = FontStyle.Italic
                 )
@@ -197,7 +197,6 @@ fun DebtorCard(
                         .clickable { onPaymentClick(debtor) }
                 )
 
-                // added in delete_dialog branch by mistake
                 if (debtor.telegramNick.isNotBlank()) {
                     Image(
                         contentDescription = "",
@@ -209,9 +208,7 @@ fun DebtorCard(
                                 shape = RoundedCornerShape(20.dp),
                                 color = Color.White
                             )
-                            .clickable {
-                                debtor.telegramNick.openTelegramChat()
-                            }
+                            .clickable { debtor.telegramNick.openTelegramChat() }
                     )
                 }
             }

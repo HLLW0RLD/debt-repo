@@ -19,8 +19,8 @@ data class Debtor(
     var loanDate: String = getCurrentDateTime(),
     @ColumnInfo(name = "transactions")
     private var _transactions: String = "",
-    val returnDate: String? = null, // опционально
-    var comment: String? = null // опционально
+    val returnDate: String = "", // опционально
+    var comment: String = "" // опционально
 ) {
     fun get_transactions(): String = _transactions
     var transactions: MutableList<Transaction>
