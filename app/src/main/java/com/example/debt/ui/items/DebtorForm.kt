@@ -1,5 +1,7 @@
 package com.example.debt.app.ui.items
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -8,9 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.debt.data.model.Debtor
-import com.example.debt.app.ui.screens.DebtorViewModel
-import java.util.*
+import com.example.debt.ui.items.DatePickerField
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DebtorForm(
     onSaveComplete: (Debtor) -> Unit
@@ -44,7 +46,11 @@ fun DebtorForm(
 
         OutlinedTextField(
             value = debtAmount,
-            onValueChange = { debtAmount = it },
+            onValueChange = {
+                debtAmount = it
+                    .trim()
+                    .replace("-", "")
+            },
             label = { Text("Сумма долга") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
@@ -52,7 +58,11 @@ fun DebtorForm(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Здесь можно добавить DatePicker для выбора даты возврата
+        DatePickerField(
+            label = "Дата возврата",
+            date = returnDate,
+            onDateChanged = { returnDate = it }
+        )
 
         OutlinedTextField(
             value = comment,
