@@ -1,9 +1,15 @@
 package com.example.debt.app.ui.items
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -30,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -42,9 +49,11 @@ import com.example.debt.utils.setColorDate
 
 @Composable
 fun DebtorCard(
+    isMine: Boolean = false,
     debtor: Debtor,
-    onDeleteDebtorClick: () -> Unit,
-    onPaymentClick: () -> Unit
+    onPaymentClick: (Debtor) -> Unit,
+    onEditClick: (Debtor) -> Unit,
+    onDeleteDebtorClick: (Debtor) -> Unit
 ) {
 
     var showHistory by remember { mutableStateOf(false) }
@@ -53,20 +62,22 @@ fun DebtorCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { onEditClick(debtor) },
+                    onTap = { /* Обычный клик -- TODO  */ },
+                    onDoubleTap = { /* Двойной клик -- TODO для открытия тг */ },
+                    onPress = { /* Начало нажатия (еще не отпустили палец) -- TODO просмотр инф. / оплата */ },
+                )
+            },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        if (debtor.telegramNick.isNotBlank()) {
-                            debtor.telegramNick.openTelegramChat()
-                        }
-                    },
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -82,7 +93,7 @@ fun DebtorCard(
                     modifier = Modifier
                         .size(32.dp)
                         .padding(4.dp)
-                        .clickable { onDeleteDebtorClick() }
+                        .clickable { onDeleteDebtorClick(debtor) }
                 )
             }
 
@@ -90,7 +101,6 @@ fun DebtorCard(
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .clickable { showHistory = !showHistory },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
@@ -150,19 +160,19 @@ fun DebtorCard(
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            debtor.returnDate?.let { date ->
+            if (debtor.returnDate.setColorDate() != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Дата возврата: ${date}",
+                    text = "Дата возврата: ${debtor.returnDate}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = date.setColorDate()
+                    color = debtor.returnDate.setColorDate() ?: Color.White
                 )
             }
 
-            debtor.comment?.let { comment ->
+            if (debtor.comment.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Комментарий: $comment",
+                    text = "Комментарий: ${debtor.comment}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontStyle = FontStyle.Italic
                 )
@@ -170,19 +180,38 @@ fun DebtorCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Icon(
-                contentDescription = "",
-                painter = painterResource(R.drawable.ic_money),
-                tint = Color.Black,
-                modifier = Modifier
-                    .size(48.dp)
-                    .padding(4.dp)
-                    .background(
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color.Yellow
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Image(
+                    contentDescription = "",
+                    painter = painterResource(R.drawable.ic_money),
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(4.dp)
+                        .background(
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color.Yellow
+                        )
+                        .clickable { onPaymentClick(debtor) }
+                )
+
+                if (debtor.telegramNick.isNotBlank()) {
+                    Image(
+                        contentDescription = "",
+                        painter = painterResource(R.drawable.ic_telegram),
+                        modifier = Modifier
+                            .size(48.dp)
+                            .padding(4.dp)
+                            .background(
+                                shape = RoundedCornerShape(20.dp),
+                                color = Color.White
+                            )
+                            .clickable { debtor.telegramNick.openTelegramChat() }
                     )
-                    .clickable { onPaymentClick() }
-            )
+                }
+            }
         }
     }
 }

@@ -15,13 +15,17 @@ import com.example.debt.ui.items.DatePickerField
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DebtorForm(
+    debtor: Debtor? = null,
     onSaveComplete: (Debtor) -> Unit
 ) {
-    var telegramNick by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var debtAmount by remember { mutableStateOf("") }
-    var returnDate by remember { mutableStateOf("") }
-    var comment by remember { mutableStateOf("") }
+
+    val isEdit = debtor != null
+
+    val name = remember { mutableStateOf(debtor?.name ?: "") }
+    val telegramNick = remember { mutableStateOf(debtor?.telegramNick ?: "") }
+    val debtAmount = remember { mutableStateOf(debtor?.debtAmount?.toString() ?: "") }
+    val returnDate = remember { mutableStateOf(debtor?.returnDate ?: "") }
+    val comment = remember { mutableStateOf(debtor?.comment ?: "") }
 
     Column(
         modifier = Modifier
@@ -29,15 +33,15 @@ fun DebtorForm(
             .fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
+            value = name.value,
+            onValueChange = { name.value = it },
             label = { Text("Имя должника") },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = telegramNick,
-            onValueChange = { telegramNick = it },
+            value = telegramNick.value,
+            onValueChange = { telegramNick.value = it },
             label = { Text("Ник в Telegram (для перехода в приложение)") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -45,9 +49,9 @@ fun DebtorForm(
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = debtAmount,
+            value = debtAmount.value,
             onValueChange = {
-                debtAmount = it
+                debtAmount.value = it
                     .trim()
                     .replace("-", "")
             },
@@ -60,13 +64,13 @@ fun DebtorForm(
 
         DatePickerField(
             label = "Дата возврата",
-            date = returnDate,
-            onDateChanged = { returnDate = it }
+            date = returnDate.value,
+            onDateChanged = { returnDate.value = it }
         )
 
         OutlinedTextField(
-            value = comment,
-            onValueChange = { comment = it },
+            value = comment.value,
+            onValueChange = { comment.value = it },
             label = { Text("Комментарий (необязательно)") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -75,18 +79,30 @@ fun DebtorForm(
 
         Button(
             onClick = {
-                val amount = debtAmount.toDoubleOrNull() ?: 0.0
-                val debtor = Debtor(
-                    telegramNick = telegramNick,
-                    name = name,
-                    debtAmount = amount,
-                    returnDate = returnDate,
-                    comment = comment.ifEmpty { null }
-                )
-                onSaveComplete(debtor)
+                if (isEdit) {
+                    val debtor = Debtor(
+                        id = debtor.id,
+                        telegramNick = if (telegramNick.value.isNotEmpty()) telegramNick.value else debtor.telegramNick,
+                        name = if (name.value.isNotEmpty()) name.value else debtor.name,
+                        debtAmount = debtor.debtAmount,
+                        returnDate = if (returnDate.value.isNotEmpty()) returnDate.value else debtor.returnDate,
+                        comment = if (comment.value.isNotEmpty()) comment.value else debtor.comment
+                    )
+                    onSaveComplete(debtor)
+                } else {
+                    val amount = debtAmount.value.toDoubleOrNull() ?: 0.0
+                    val debtor = Debtor(
+                        telegramNick = telegramNick.value,
+                        name = name.value,
+                        debtAmount = amount,
+                        returnDate = returnDate.value,
+                        comment = comment.value
+                    )
+                    onSaveComplete(debtor)
+                }
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = name.isNotBlank() && debtAmount.toDoubleOrNull() != null
+            enabled = name.value.isNotBlank() && debtAmount.value.toDoubleOrNull() != null
         ) {
             Text("Сохранить")
         }
