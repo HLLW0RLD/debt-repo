@@ -65,6 +65,7 @@ fun String.setColorDate(): Color {
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
         if (!this.matches(Regex("\\d{2}\\.\\d{2}\\.\\d{4}"))) {
+            return Color.White
             throw IllegalArgumentException("Дата должна быть в формате dd.MM.yyyy")
         }
 
@@ -78,7 +79,7 @@ fun String.setColorDate(): Color {
             daysDifference in 3..7 -> Color.Yellow
             daysDifference in 1..2 -> Color.hsl(35f, 1f, 0.5f)
             daysDifference == 0L -> Color.Red
-            else -> Color.Red
+            else -> Color.White
         }
     } catch (e : Exception) {
         errorLog("string: $this \nerror $e")
