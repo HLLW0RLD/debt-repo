@@ -197,6 +197,7 @@ fun DebtorCard(
                         .clickable { onPaymentClick(debtor) }
                 )
 
+                // added in delete_dialog branch by mistake
                 if (debtor.telegramNick.isNotBlank()) {
                     Image(
                         contentDescription = "",
