@@ -2,14 +2,10 @@ package com.example.debt.app.ui.items
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -47,6 +43,9 @@ import com.example.debt.data.model.TransactionType
 import com.example.debt.utils.openTelegramChat
 import com.example.debt.utils.setColorDate
 
+const val PLUS = "+"
+const val MINUS = "-"
+
 @Composable
 fun DebtorCard(
     isMine: Boolean = false,
@@ -81,11 +80,24 @@ fun DebtorCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = debtor.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Icon(
+                        modifier = Modifier.size(16.dp),
+                        contentDescription = "",
+                        painter = if (isMine) painterResource(R.drawable.ic_graph_down) else painterResource(R.drawable.ic_graph_up),
+                        tint = if (isMine) Color.Red else Color.Green
+                    )
+                    Spacer(Modifier.size(4.dp))
+                    Text(
+                        text = debtor.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
                 Icon(
                     contentDescription = "",
                     painter = painterResource(R.drawable.ic_delete_outline),
@@ -133,8 +145,18 @@ fun DebtorCard(
                 ) {
                     items(debtor.transactions.size) { transactionInd ->
                         val transaction = debtor.transactions[debtor.transactions.size - 1 - transactionInd]
-                        val operator = if (transaction.type == TransactionType.PAYMENT) "+" else "-"
+                        val operator = if (transaction.type == TransactionType.PAYMENT) PLUS else MINUS
                         val color = if (transaction.type == TransactionType.PAYMENT) Color.Green else Color.Red
+                        var trueOperator = ""
+                        var trueColor = Color.White
+
+                        if (isMine) {
+                            trueOperator = if (operator == PLUS) MINUS else PLUS
+                            trueColor = if (color == Color.Red) Color.Green else Color.Red
+                        } else {
+                            trueOperator = operator
+                            trueColor = color
+                        }
 
                         Text(
                             text = "${transaction.type.v.uppercase()} - ${transaction.date}",
@@ -142,9 +164,9 @@ fun DebtorCard(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "$operator ${transaction.amount} ₽",
+                            text = "$trueOperator ${transaction.amount} ₽",
                             style = MaterialTheme.typography.titleLarge,
-                            color = color
+                            color = trueColor
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Divider(Modifier.fillMaxWidth())

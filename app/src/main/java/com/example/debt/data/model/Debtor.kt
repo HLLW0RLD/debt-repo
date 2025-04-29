@@ -14,6 +14,7 @@ data class Debtor(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
+    val isMine: Boolean = false,
     val telegramNick: String,
     val debtAmount: Double,
     var loanDate: String = getCurrentDateTime(),
