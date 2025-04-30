@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -40,8 +41,11 @@ import androidx.compose.ui.unit.dp
 import com.example.debt.R
 import com.example.debt.data.model.Debtor
 import com.example.debt.data.model.TransactionType
+import com.example.debt.utils.darkBGColors
 import com.example.debt.utils.openTelegramChat
+import com.example.debt.utils.lightBGColors
 import com.example.debt.utils.setColorDate
+import kotlin.math.abs
 
 const val PLUS = "+"
 const val MINUS = "-"
@@ -55,8 +59,13 @@ fun DebtorCard(
     onDeleteDebtorClick: (Debtor) -> Unit
 ) {
 
-    var showHistory by remember { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
+    var showHistory by remember { mutableStateOf(false) }
+    val isSystemInDarkTheme = isSystemInDarkTheme()
+    val cardColor = remember(debtor.id) {
+        val index = abs(debtor.id.hashCode()) % (lightBGColors.size + darkBGColors.size)
+        if (isSystemInDarkTheme) darkBGColors[index] else lightBGColors[index]
+    }
 
     Card(
         modifier = Modifier
@@ -70,7 +79,10 @@ fun DebtorCard(
                     onPress = { /* Начало нажатия (еще не отпустили палец) -- TODO просмотр инф. / оплата */ },
                 )
             },
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = cardColor
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
