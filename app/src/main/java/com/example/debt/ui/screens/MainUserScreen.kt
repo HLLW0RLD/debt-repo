@@ -20,12 +20,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,12 +65,25 @@ fun MainUserScreen() {
 
     var editedDebtor by remember { mutableStateOf<Debtor?>(null) }
 
+    var isMineDebtsState by remember { mutableStateOf(false) }
+
+    val tabs = listOf("все", "мне должны", "я должен")
+    var selectedTab by remember { mutableIntStateOf(0) }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = Color.Black.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+        }
+    }
+
+    val filteredDebtors = remember(debtors, selectedTab) {
+        when (selectedTab) {
+            1 -> debtors.filter { !it.isMine }
+            2 -> debtors.filter { it.isMine }
+            else -> debtors
         }
     }
 
@@ -92,15 +108,39 @@ fun MainUserScreen() {
                 .height(2.dp)
                 .background(Color.Black)
             )
+
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = Color.White,
+                contentColor = Color.Black,
+                indicator = { }
+            ) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTab == index,
+                        onClick = {
+                            selectedTab = index
+                            isMineDebtsState = index == 2
+                        },
+                        text = {
+                            Text(
+                                text = title,
+                                color = if (selectedTab == index) Color.Black else Color.LightGray,
+                            )
+                        }
+                    )
+                }
+            }
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(6.dp,),
             ) {
-                val revDebt = debtors
-                items(debtors.size) { debtor ->
+                items(filteredDebtors.size) { index ->
                     DebtorCard(
-                        debtor = revDebt[debtor],
+                        isMine = filteredDebtors[index].isMine,
+                        debtor = filteredDebtors[index],
                         onDeleteDebtorClick = {
                             selectedDebtor = it
                             showDeleteDialog = true
@@ -111,6 +151,7 @@ fun MainUserScreen() {
                         },
                         onEditClick = {
                             editedDebtor = it
+                            isMineDebtsState = it.isMine
                             showBottomSheet = true
                         }
                     )
@@ -128,6 +169,8 @@ fun MainUserScreen() {
                 .align(Alignment.BottomEnd)
                 .background(shape = CircleShape, color = Color.White),
             onClick = {
+                isMineDebtsState = selectedTab == 2
+                editedDebtor = null
                 showBottomSheet = true
             }
         ) {
@@ -176,6 +219,7 @@ fun MainUserScreen() {
             ) {
                DebtorForm(
                    debtor = editedDebtor,
+                   isMine = isMineDebtsState,
                    onSaveComplete = {
                        if (editedDebtor != null) {
                            viewModel.updateDebt(it)

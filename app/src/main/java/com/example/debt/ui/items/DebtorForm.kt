@@ -2,20 +2,28 @@ package com.example.debt.app.ui.items
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.debt.data.model.Debtor
 import com.example.debt.ui.items.DatePickerField
+import com.example.debt.utils.setColorDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DebtorForm(
     debtor: Debtor? = null,
+    isMine: Boolean = false,
     onSaveComplete: (Debtor) -> Unit
 ) {
 
@@ -26,6 +34,7 @@ fun DebtorForm(
     val debtAmount = remember { mutableStateOf(debtor?.debtAmount?.toString() ?: "") }
     val returnDate = remember { mutableStateOf(debtor?.returnDate ?: "") }
     val comment = remember { mutableStateOf(debtor?.comment ?: "") }
+    val isMineState = remember { mutableStateOf(debtor?.isMine ?: isMine) }
 
     Column(
         modifier = Modifier
@@ -38,6 +47,44 @@ fun DebtorForm(
             label = { Text("Имя должника") },
             modifier = Modifier.fillMaxWidth()
         )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Тип долга:",
+                modifier = Modifier.padding(end = 16.dp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                    .padding(vertical = 4.dp)
+            ) {
+                // Вариант "Мне должны"
+                Box(
+                    modifier = Modifier
+                        .clickable { isMineState.value = false }
+                        .background(if (!isMineState.value) Color.LightGray else Color.Transparent)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text("Мне должны", color = if (!isMineState.value) Color.Black else Color.White)
+                }
+
+                // Вариант "Я должен"
+                Box(
+                    modifier = Modifier
+                        .clickable { isMineState.value = true }
+                        .background(if (isMineState.value) Color.LightGray else Color.Transparent)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text("Я должен", color = if (isMineState.value) Color.Black else Color.White)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = telegramNick.value,
@@ -82,6 +129,7 @@ fun DebtorForm(
                 if (isEdit) {
                     val debtor = Debtor(
                         id = debtor.id,
+                        isMine = isMineState.value,
                         telegramNick = if (telegramNick.value.isNotEmpty()) telegramNick.value else debtor.telegramNick,
                         name = if (name.value.isNotEmpty()) name.value else debtor.name,
                         debtAmount = debtor.debtAmount,
@@ -93,6 +141,7 @@ fun DebtorForm(
                     val amount = debtAmount.value.toDoubleOrNull() ?: 0.0
                     val debtor = Debtor(
                         telegramNick = telegramNick.value,
+                        isMine = isMineState.value,
                         name = name.value,
                         debtAmount = amount,
                         returnDate = returnDate.value,
