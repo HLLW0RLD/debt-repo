@@ -45,10 +45,10 @@ fun DebtorForm(
     ) {
         OutlinedTextField(
             colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = color ?: AppColors.accentPrimary,
-                unfocusedLabelColor = color ?: AppColors.accentPrimary,
-                focusedBorderColor = color ?: AppColors.accentPrimary,
-                unfocusedBorderColor = color ?: AppColors.accentPrimary,
+                focusedLabelColor = color ?: AppColors.textPrimary,
+                unfocusedLabelColor = color ?: AppColors.textPrimary,
+                focusedBorderColor = color ?: AppColors.textPrimary,
+                unfocusedBorderColor = color ?: AppColors.textPrimary,
             ),
             value = name.value,
             onValueChange = { name.value = it },
@@ -91,8 +91,8 @@ fun DebtorForm(
                     selected = isMineState.value,
                     onClick = { isMineState.value = true },
                     colors = RadioButtonDefaults.colors(
-                        selectedColor = Color.Black,
-                        unselectedColor = Color.Gray
+                        selectedColor = color ?: AppColors.accentPrimary,
+                        unselectedColor = AppColors.surface
                     )
                 )
                 Text(
@@ -102,7 +102,7 @@ fun DebtorForm(
                         .clickable {
                             isMineState.value = true
                         },
-                    color = if (isMineState.value) Color.Black else Color.Gray
+                    color = if (isMineState.value) AppColors.textPrimary else AppColors.divider
                 )
             }
         }
@@ -111,10 +111,10 @@ fun DebtorForm(
 
         OutlinedTextField(
             colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = color ?: AppColors.accentPrimary,
-                unfocusedLabelColor = color ?: AppColors.accentPrimary,
-                focusedBorderColor = color ?: AppColors.accentPrimary,
-                unfocusedBorderColor = color ?: AppColors.accentPrimary,
+                focusedLabelColor = color ?: AppColors.textPrimary,
+                unfocusedLabelColor = color ?: AppColors.textPrimary,
+                focusedBorderColor = color ?: AppColors.textPrimary,
+                unfocusedBorderColor = color ?: AppColors.textPrimary,
             ),
             value = telegramNick.value,
             onValueChange = { telegramNick.value = it },
@@ -126,10 +126,10 @@ fun DebtorForm(
 
         OutlinedTextField(
             colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = color ?: AppColors.accentPrimary,
-                unfocusedLabelColor = color ?: AppColors.accentPrimary,
-                focusedBorderColor = color ?: AppColors.accentPrimary,
-                unfocusedBorderColor = color ?: AppColors.accentPrimary,
+                focusedLabelColor = color ?: AppColors.textPrimary,
+                unfocusedLabelColor = color ?: AppColors.textPrimary,
+                focusedBorderColor = color ?: AppColors.textPrimary,
+                unfocusedBorderColor = color ?: AppColors.textPrimary,
             ),
             value = debtAmount.value,
             onValueChange = {
@@ -152,10 +152,10 @@ fun DebtorForm(
 
         OutlinedTextField(
             colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = color ?: AppColors.accentPrimary,
-                unfocusedLabelColor = color ?: AppColors.accentPrimary,
-                focusedBorderColor = color ?: AppColors.accentPrimary,
-                unfocusedBorderColor = color ?: AppColors.accentPrimary,
+                focusedLabelColor = color ?: AppColors.textPrimary,
+                unfocusedLabelColor = color ?: AppColors.textPrimary,
+                focusedBorderColor = color ?: AppColors.textPrimary,
+                unfocusedBorderColor = color ?: AppColors.textPrimary,
             ),
             value = comment.value,
             onValueChange = { comment.value = it },
@@ -194,9 +194,9 @@ fun DebtorForm(
             modifier = Modifier.fillMaxWidth(),
             enabled = name.value.isNotBlank() && debtAmount.value.toDoubleOrNull() != null,
             colors = ButtonColors(
-                contentColor = AppColors.textPrimary,
-                disabledContentColor = AppColors.divider,
-                disabledContainerColor = color ?: AppColors.accentSecondary,
+                contentColor = AppColors.background,
+                disabledContentColor = AppColors.background,
+                disabledContainerColor = color ?: AppColors.surface,
                 containerColor = color ?: AppColors.accentPrimary,
             )
         ) {
