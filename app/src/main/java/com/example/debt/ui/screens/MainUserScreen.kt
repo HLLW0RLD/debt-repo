@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +51,7 @@ import com.example.debt.app.ui.items.DebtorCard
 import com.example.debt.app.ui.items.DebtorForm
 import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.SimpleDebtDialog
+import com.example.debt.ui.items.ThemeSelectionDialog
 import com.example.debt.utils.AppColors
 import org.koin.androidx.compose.koinViewModel
 
@@ -75,6 +77,8 @@ fun MainUserScreen() {
     val tabs = listOf("все", "мне должны", "я должен")
     var selectedTab by remember { mutableIntStateOf(0) }
 
+    var showThemeDialog by remember { mutableStateOf(false) }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -99,15 +103,16 @@ fun MainUserScreen() {
             Spacer(Modifier.size(50.dp))
             Row(
                 modifier = Modifier
-                    .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
+                    .background(AppColors.background)
                     .fillMaxWidth(),
             ) {
                 Spacer(Modifier.size(12.dp))
                 Text(
                     text = "debt",
                     fontSize = 48.sp,
-                    color = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    color = AppColors.textPrimary,
                     fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable { showThemeDialog = true }
                 )
             }
             Divider(Modifier
@@ -221,6 +226,12 @@ fun MainUserScreen() {
             )
         }
 
+        if (showThemeDialog) {
+            ThemeSelectionDialog(
+                onDismissRequest = { showThemeDialog = false }
+            )
+        }
+
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
@@ -229,11 +240,12 @@ fun MainUserScreen() {
                     editedDebtorBGcolor = null
                 },
                 sheetState = rememberModalBottomSheetState(),
-                containerColor = editedDebtorBGcolor ?: AppColors.accentSecondary,
+                containerColor = AppColors.background,
             ) {
                DebtorForm(
                    debtor = editedDebtor,
                    isMine = isMineDebtsState,
+                   color = editedDebtorBGcolor,
                    onSaveComplete = {
                        if (editedDebtor != null) {
                            viewModel.updateDebt(it)

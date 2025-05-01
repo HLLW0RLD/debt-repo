@@ -45,6 +45,7 @@ import com.example.debt.data.model.Debtor
 import com.example.debt.data.model.TransactionType
 import com.example.debt.utils.AppColors
 import com.example.debt.utils.PreferenceCache
+import com.example.debt.utils.ThemeMode
 import com.example.debt.utils.generateColorScheme
 import com.example.debt.utils.openTelegramChat
 import com.example.debt.utils.setColorDate
@@ -77,7 +78,7 @@ fun DebtorCard(
                     onLongPress = {
                         onEditClick(
                             debtor,
-                            if (PreferenceCache.isColorTheme) {
+                            if (PreferenceCache.selectedTheme == ThemeMode.COLOR) {
                                 cardColor
                             } else {
                                 null
@@ -91,7 +92,7 @@ fun DebtorCard(
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (PreferenceCache.isColorTheme) {
+            containerColor = if (PreferenceCache.selectedTheme == ThemeMode.COLOR) {
                 cardColor
             } else {
                 AppColors.surface

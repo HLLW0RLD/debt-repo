@@ -44,6 +44,12 @@ fun DebtorForm(
             .padding(16.dp)
     ) {
         OutlinedTextField(
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedLabelColor = color ?: AppColors.accentPrimary,
+                unfocusedLabelColor = color ?: AppColors.accentPrimary,
+                focusedBorderColor = color ?: AppColors.accentPrimary,
+                unfocusedBorderColor = color ?: AppColors.accentPrimary,
+            ),
             value = name.value,
             onValueChange = { name.value = it },
             label = { Text("Имя должника") },
@@ -63,8 +69,8 @@ fun DebtorForm(
                     selected = !isMineState.value,
                     onClick = { isMineState.value = false },
                     colors = RadioButtonDefaults.colors(
-                        selectedColor = Color.Black,
-                        unselectedColor = Color.Gray
+                        selectedColor = color ?: AppColors.accentPrimary,
+                        unselectedColor = AppColors.surface
                     )
                 )
                 Text(
@@ -74,7 +80,7 @@ fun DebtorForm(
                         .clickable {
                             isMineState.value = false
                         },
-                    color = if (!isMineState.value) Color.Black else Color.Gray
+                    color = if (!isMineState.value) AppColors.textPrimary else AppColors.divider
                 )
             }
             Row(
@@ -104,6 +110,12 @@ fun DebtorForm(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedLabelColor = color ?: AppColors.accentPrimary,
+                unfocusedLabelColor = color ?: AppColors.accentPrimary,
+                focusedBorderColor = color ?: AppColors.accentPrimary,
+                unfocusedBorderColor = color ?: AppColors.accentPrimary,
+            ),
             value = telegramNick.value,
             onValueChange = { telegramNick.value = it },
             label = { Text("Ник в Telegram (для перехода в приложение)") },
@@ -113,6 +125,12 @@ fun DebtorForm(
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedLabelColor = color ?: AppColors.accentPrimary,
+                unfocusedLabelColor = color ?: AppColors.accentPrimary,
+                focusedBorderColor = color ?: AppColors.accentPrimary,
+                unfocusedBorderColor = color ?: AppColors.accentPrimary,
+            ),
             value = debtAmount.value,
             onValueChange = {
                 debtAmount.value = it
@@ -133,6 +151,12 @@ fun DebtorForm(
         )
 
         OutlinedTextField(
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedLabelColor = color ?: AppColors.accentPrimary,
+                unfocusedLabelColor = color ?: AppColors.accentPrimary,
+                focusedBorderColor = color ?: AppColors.accentPrimary,
+                unfocusedBorderColor = color ?: AppColors.accentPrimary,
+            ),
             value = comment.value,
             onValueChange = { comment.value = it },
             label = { Text("Комментарий (необязательно)") },
@@ -168,7 +192,13 @@ fun DebtorForm(
                 }
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = name.value.isNotBlank() && debtAmount.value.toDoubleOrNull() != null
+            enabled = name.value.isNotBlank() && debtAmount.value.toDoubleOrNull() != null,
+            colors = ButtonColors(
+                contentColor = AppColors.textPrimary,
+                disabledContentColor = AppColors.divider,
+                disabledContainerColor = color ?: AppColors.accentSecondary,
+                containerColor = color ?: AppColors.accentPrimary,
+            )
         ) {
             Text("Сохранить")
         }

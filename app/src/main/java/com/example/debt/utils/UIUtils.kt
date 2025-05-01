@@ -1,11 +1,22 @@
 package com.example.debt.utils
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import com.example.debt.utils.ThemeMode
 import kotlin.math.abs
 
 
@@ -39,16 +50,24 @@ val darkBGColors = listOf(
     Color(0xFF9FAFBA)  // storm grey
 )
 
+enum class ThemeMode {
+    SYSTEM, LIGHT, DARK, COLOR
+}
+
+@SuppressLint("RememberReturnType")
 @Composable
 fun AppTheme(
+    isSystemDark: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val themeMode = PreferenceCache.selectedTheme
 
-    val colorScheme = when(themeMode) {
-        PreferenceCache.ThemeMode.LIGHT -> LightColorScheme
-        PreferenceCache.ThemeMode.SYSTEM -> if (isSystemInDarkTheme()) { DarkColorScheme } else { LightColorScheme }
-        else -> DarkColorScheme
+    val colorScheme = remember(PreferenceCache.themeChanged.value) {
+        when (PreferenceCache.selectedTheme) {
+            ThemeMode.COLOR -> if (isSystemDark) DarkRandomColorScheme else LightRandomColorScheme
+            ThemeMode.SYSTEM -> if (isSystemDark) DarkColorScheme else LightColorScheme
+            ThemeMode.DARK -> DarkColorScheme
+            ThemeMode.LIGHT -> LightColorScheme
+        }
     }
 
     MaterialTheme(
@@ -126,6 +145,38 @@ private val LightColorScheme = lightColorScheme(
 )
 
 private val DarkColorScheme = darkColorScheme(
+    primary = YellowPrimary,
+    primaryContainer = YellowSecondary,
+    secondary = YellowTertiary,
+    secondaryContainer = YellowSecondary,
+    tertiary = Color(0xFFBDBDBD),
+    background = Color(0xFF121212),
+    surface = Color(0xFF1E1E1E),
+    error = Color(0xFFB00020),
+    onPrimary = Color(0xFF000000),
+    onSecondary = Color(0xFF000000),
+    onBackground = Color(0xFFFFFFFF),
+    onSurface = Color(0xFFFFFFFF),
+    onError = Color(0xFF000000)
+)
+
+private val LightRandomColorScheme = lightColorScheme(
+    primary = YellowPrimary,
+    primaryContainer = YellowTertiary,
+    secondary = YellowSecondary,
+    secondaryContainer = YellowTertiary,
+    tertiary = Color(0xFF424242),
+    background = Color(0xFFFFFFFF),
+    surface = Color(0xFFE7E7E7),
+    error = Color(0xFFB00020),
+    onPrimary = Color(0xFF000000),
+    onSecondary = Color(0xFF000000),
+    onBackground = Color(0xFF000000),
+    onSurface = Color(0xFF000000),
+    onError = Color(0xFFFFFFFF)
+)
+
+private val DarkRandomColorScheme = darkColorScheme(
     primary = YellowPrimary,
     primaryContainer = YellowSecondary,
     secondary = YellowTertiary,
