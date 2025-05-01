@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -41,11 +43,12 @@ import androidx.compose.ui.unit.dp
 import com.example.debt.R
 import com.example.debt.data.model.Debtor
 import com.example.debt.data.model.TransactionType
-import com.example.debt.utils.darkBGColors
+import com.example.debt.utils.AppColors
+import com.example.debt.utils.PreferenceCache
+import com.example.debt.utils.ThemeMode
+import com.example.debt.utils.generateColorScheme
 import com.example.debt.utils.openTelegramChat
-import com.example.debt.utils.lightBGColors
 import com.example.debt.utils.setColorDate
-import kotlin.math.abs
 
 const val PLUS = "+"
 const val MINUS = "-"
@@ -55,7 +58,7 @@ fun DebtorCard(
     isMine: Boolean = false,
     debtor: Debtor,
     onPaymentClick: (Debtor) -> Unit,
-    onEditClick: (Debtor) -> Unit,
+    onEditClick: (Debtor, Color?) -> Unit,
     onDeleteDebtorClick: (Debtor) -> Unit
 ) {
 
@@ -63,8 +66,7 @@ fun DebtorCard(
     var showHistory by remember { mutableStateOf(false) }
     val isSystemInDarkTheme = isSystemInDarkTheme()
     val cardColor = remember(debtor.id) {
-        val index = abs(debtor.id.hashCode()) % (lightBGColors.size + darkBGColors.size)
-        if (isSystemInDarkTheme) darkBGColors[index] else lightBGColors[index]
+        generateColorScheme(debtor.id, isSystemInDarkTheme)
     }
 
     Card(
@@ -73,7 +75,16 @@ fun DebtorCard(
             .padding(8.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onLongPress = { onEditClick(debtor) },
+                    onLongPress = {
+                        onEditClick(
+                            debtor,
+                            if (PreferenceCache.selectedTheme == ThemeMode.COLOR) {
+                                cardColor
+                            } else {
+                                null
+                            }
+                        )
+                    },
                     onTap = { /* Обычный клик -- TODO  */ },
                     onDoubleTap = { /* Двойной клик -- TODO для открытия тг */ },
                     onPress = { /* Начало нажатия (еще не отпустили палец) -- TODO просмотр инф. / оплата */ },
@@ -81,14 +92,26 @@ fun DebtorCard(
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = cardColor
+            containerColor = if (PreferenceCache.selectedTheme == ThemeMode.COLOR) {
+                cardColor
+            } else {
+                AppColors.surface
+            }
         )
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(6.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = AppColors.background
+            )
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(AppColors.background)
+                    .padding(start = 8.dp, end = 4.dp, top = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -100,20 +123,20 @@ fun DebtorCard(
                         modifier = Modifier.size(16.dp),
                         contentDescription = "",
                         painter = if (isMine) painterResource(R.drawable.ic_graph_down) else painterResource(R.drawable.ic_graph_up),
-                        tint = if (isMine) Color.Red else Color.Green
+                        tint = if (isMine) AppColors.error else AppColors.success
                     )
                     Spacer(Modifier.size(4.dp))
                     Text(
                         text = debtor.name,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = AppColors.textPrimary
                     )
                 }
                 Icon(
                     contentDescription = "",
                     painter = painterResource(R.drawable.ic_delete_outline),
-                    tint = Color.Red,
+                    tint = AppColors.textPrimary,
                     modifier = Modifier
                         .size(32.dp)
                         .padding(4.dp)
@@ -121,10 +144,9 @@ fun DebtorCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
             Row(
                 modifier = Modifier
+                    .padding(start = 8.dp, end = 4.dp, bottom = 8.dp)
                     .clickable { showHistory = !showHistory },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
@@ -132,18 +154,18 @@ fun DebtorCard(
                 Text(
                     text = "Долг: ${debtor.debtAmount} ₽",
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.textPrimary
                 )
 
                 Spacer(modifier = Modifier.size(8.dp))
 
                 Icon(
                     contentDescription = "",
-                    painter = painterResource(if (showHistory) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up)
+                    painter = painterResource(if (showHistory) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up),
+                    tint = AppColors.textPrimary
                 )
             }
-
-            Spacer(modifier = Modifier.height(4.dp))
 
             AnimatedVisibility(visible = showHistory) {
                 LazyColumn(
@@ -158,13 +180,13 @@ fun DebtorCard(
                     items(debtor.transactions.size) { transactionInd ->
                         val transaction = debtor.transactions[debtor.transactions.size - 1 - transactionInd]
                         val operator = if (transaction.type == TransactionType.PAYMENT) PLUS else MINUS
-                        val color = if (transaction.type == TransactionType.PAYMENT) Color.Green else Color.Red
+                        val color = if (transaction.type == TransactionType.PAYMENT) AppColors.success else AppColors.error
                         var trueOperator = ""
                         var trueColor = Color.White
 
                         if (isMine) {
                             trueOperator = if (operator == PLUS) MINUS else PLUS
-                            trueColor = if (color == Color.Red) Color.Green else Color.Red
+                            trueColor = if (color == AppColors.error) AppColors.success else AppColors.error
                         } else {
                             trueOperator = operator
                             trueColor = color
@@ -173,7 +195,8 @@ fun DebtorCard(
                         Text(
                             text = "${transaction.type.v.uppercase()} - ${transaction.date}",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.textPrimary
                         )
                         Text(
                             text = "$trueOperator ${transaction.amount} ₽",
@@ -186,8 +209,11 @@ fun DebtorCard(
                     }
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.height(8.dp))
+        Column(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+        ) {
 
             Text(
                 text = "Дата займа: ${debtor.loanDate}",
@@ -221,12 +247,12 @@ fun DebtorCard(
                 Image(
                     contentDescription = "",
                     painter = painterResource(R.drawable.ic_money),
+                    colorFilter = ColorFilter.tint(AppColors.accentPrimary),
                     modifier = Modifier
                         .size(48.dp)
-                        .padding(4.dp)
                         .background(
                             shape = RoundedCornerShape(20.dp),
-                            color = Color.Yellow
+                            color = AppColors.background
                         )
                         .clickable { onPaymentClick(debtor) }
                 )
@@ -237,7 +263,6 @@ fun DebtorCard(
                         painter = painterResource(R.drawable.ic_telegram),
                         modifier = Modifier
                             .size(48.dp)
-                            .padding(4.dp)
                             .background(
                                 shape = RoundedCornerShape(20.dp),
                                 color = Color.White

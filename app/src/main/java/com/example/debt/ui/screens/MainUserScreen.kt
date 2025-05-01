@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,6 +51,8 @@ import com.example.debt.app.ui.items.DebtorCard
 import com.example.debt.app.ui.items.DebtorForm
 import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.SimpleDebtDialog
+import com.example.debt.ui.items.ThemeSelectionDialog
+import com.example.debt.utils.AppColors
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -68,8 +72,12 @@ fun MainUserScreen() {
 
     var isMineDebtsState by remember { mutableStateOf(false) }
 
+    var editedDebtorBGcolor by remember { mutableStateOf<Color?>(null) }
+
     val tabs = listOf("все", "мне должны", "я должен")
     var selectedTab by remember { mutableIntStateOf(0) }
+
+    var showThemeDialog by remember { mutableStateOf(false) }
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -92,16 +100,19 @@ fun MainUserScreen() {
         contentAlignment = Alignment.Center
     ) {
         Column {
-            Spacer(Modifier.size(45.dp))
+            Spacer(Modifier.size(50.dp))
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .background(AppColors.background)
+                    .fillMaxWidth(),
             ) {
                 Spacer(Modifier.size(12.dp))
                 Text(
                     text = "debt",
                     fontSize = 48.sp,
-                    color = Color.Black,
+                    color = AppColors.textPrimary,
                     fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable { showThemeDialog = true }
                 )
             }
             Divider(Modifier
@@ -112,8 +123,8 @@ fun MainUserScreen() {
 
             TabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
-                contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                containerColor = AppColors.background,
+                contentColor = AppColors.textPrimary,
                 indicator = { }
             ) {
                 tabs.forEachIndexed { index, title ->
@@ -127,10 +138,9 @@ fun MainUserScreen() {
                             Text(
                                 text = title,
                                 color = if (selectedTab == index) {
-                                    Color.Black
-                                    if (isSystemInDarkTheme()) Color.White else Color.Black
+                                    AppColors.textPrimary
                                 } else {
-                                    if (isSystemInDarkTheme()) Color.DarkGray else Color.LightGray
+                                    AppColors.divider
                                 },
                             )
                         }
@@ -140,10 +150,11 @@ fun MainUserScreen() {
 
             LazyColumn(
                 modifier = Modifier
-                    .background(if (isSystemInDarkTheme()) Color.DarkGray else Color.White)
+                    .background(AppColors.background)
                     .fillMaxSize()
                     .padding(6.dp,),
             ) {
+                item { Spacer(Modifier.size(12.dp)) }
                 items(filteredDebtors.size) { index ->
                     DebtorCard(
                         isMine = filteredDebtors[index].isMine,
@@ -156,16 +167,15 @@ fun MainUserScreen() {
                             selectedDebtor = it
                             showPaymentDialog = true
                         },
-                        onEditClick = {
-                            editedDebtor = it
-                            isMineDebtsState = it.isMine
+                        onEditClick = { debtor, color ->
+                            editedDebtorBGcolor = color
+                            editedDebtor = debtor
+                            isMineDebtsState = debtor.isMine
                             showBottomSheet = true
                         }
                     )
                 }
-                item {
-                    Spacer(Modifier.size(24.dp))
-                }
+                item { Spacer(Modifier.size(52.dp)) }
             }
         }
 
@@ -216,17 +226,26 @@ fun MainUserScreen() {
             )
         }
 
+        if (showThemeDialog) {
+            ThemeSelectionDialog(
+                onDismissRequest = { showThemeDialog = false }
+            )
+        }
+
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
                     showBottomSheet = false
                     editedDebtor = null
+                    editedDebtorBGcolor = null
                 },
-                sheetState = rememberModalBottomSheetState()
+                sheetState = rememberModalBottomSheetState(),
+                containerColor = AppColors.background,
             ) {
                DebtorForm(
                    debtor = editedDebtor,
                    isMine = isMineDebtsState,
+                   color = editedDebtorBGcolor,
                    onSaveComplete = {
                        if (editedDebtor != null) {
                            viewModel.updateDebt(it)
