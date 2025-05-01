@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -111,8 +112,8 @@ fun MainUserScreen() {
 
             TabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = Color.White,
-                contentColor = Color.Black,
+                containerColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
+                contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
                 indicator = { }
             ) {
                 tabs.forEachIndexed { index, title ->
@@ -125,7 +126,12 @@ fun MainUserScreen() {
                         text = {
                             Text(
                                 text = title,
-                                color = if (selectedTab == index) Color.Black else Color.LightGray,
+                                color = if (selectedTab == index) {
+                                    Color.Black
+                                    if (isSystemInDarkTheme()) Color.White else Color.Black
+                                } else {
+                                    if (isSystemInDarkTheme()) Color.DarkGray else Color.LightGray
+                                },
                             )
                         }
                     )
@@ -134,6 +140,7 @@ fun MainUserScreen() {
 
             LazyColumn(
                 modifier = Modifier
+                    .background(if (isSystemInDarkTheme()) Color.DarkGray else Color.White)
                     .fillMaxSize()
                     .padding(6.dp,),
             ) {
