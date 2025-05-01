@@ -2,7 +2,9 @@ package com.example.debt.app.ui.items
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,12 +17,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.debt.data.model.Debtor
 import com.example.debt.ui.items.DatePickerField
+import com.example.debt.utils.AppColors
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DebtorForm(
     debtor: Debtor? = null,
     isMine: Boolean = false,
+    color: Color? = null,
     onSaveComplete: (Debtor) -> Unit
 ) {
 
@@ -35,8 +39,9 @@ fun DebtorForm(
 
     Column(
         modifier = Modifier
-            .padding(16.dp)
             .fillMaxWidth()
+            .background(AppColors.background)
+            .padding(16.dp)
     ) {
         OutlinedTextField(
             value = name.value,
