@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.debt.data.model.Debtor
+import com.example.debt.ui.items.baseElements.DebtRadioButton
+import com.example.debt.ui.items.baseElements.DebtTextButton
 import com.example.debt.utils.AppColors
 
 @Composable
@@ -75,62 +77,33 @@ fun PaymentDialog(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Spacer(Modifier.width(16.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = !isAddition,
-                            onClick = { isAddition = false },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = color ?: AppColors.accentPrimary,
-                                unselectedColor = AppColors.surface
-                            )
-                        )
-                        Text("Оплата займа",
-                            modifier = Modifier
-                                .clickable {
-                                    isAddition = false
-                                }
-                        )
-                    }
+                    DebtRadioButton(
+                        selected = !isAddition,
+                        onClick = { isAddition = false },
+                        color = color,
+                        text = "Оплата займа"
+                    )
 
                     Spacer(Modifier.width(16.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = isAddition,
-                            onClick = { isAddition = true },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = color ?: AppColors.accentPrimary,
-                                unselectedColor = AppColors.surface
-                            )
-                        )
-                        Text(
-                            "Новый займ",
-                            modifier = Modifier
-                                .clickable {
-                                    isAddition = true
-                                }
-                        )
-                    }
+                    DebtRadioButton(
+                        selected = isAddition,
+                        onClick = { isAddition = true },
+                        color = color,
+                        text = "Новый займ"
+                    )
                 }
             }
         },
         confirmButton = {
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = color ?: AppColors.accentPrimary,
-                    disabledContainerColor = color ?: AppColors.accentPrimary,
-                ),
-                onClick = {
-                    amount.toDoubleOrNull()?.let {
-                        onPayment(it, isAddition)
-                        onDismiss()
-                    }
-                },
+            DebtTextButton(
+                color = color,
+                text = "Подтвердить",
                 enabled = amount.toDoubleOrNull() != null
             ) {
-                Text(
-                    text = "Подтвердить",
-                    color = AppColors.background
-                )
+                amount.toDoubleOrNull()?.let {
+                    onPayment(it, isAddition)
+                    onDismiss()
+                }
             }
         },
         dismissButton = {
