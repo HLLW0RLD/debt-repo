@@ -1,4 +1,4 @@
-package com.example.debt.ui.items
+package com.example.debt.ui.items.baseElements
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -44,23 +44,17 @@ fun ReturnDatePickerDialog(
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(
-                onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        val selectedDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                            .format(Date(millis))
-                        onDateSelected(selectedDate)
-                    }
-                    onDismiss()
+            DebtTextButton(color = color, text = "OK") {
+                datePickerState.selectedDateMillis?.let { millis ->
+                    val selectedDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                        .format(Date(millis))
+                    onDateSelected(selectedDate)
                 }
-            ) {
-                Text("OK", color = AppColors.background)
+                onDismiss()
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Отмена", color = AppColors.background)
-            }
+            DebtTextButton(text = "Отмена", color = color) { onDismiss }
         },
         colors = DatePickerDefaults.colors(
             containerColor = color ?: AppColors.accentPrimary,

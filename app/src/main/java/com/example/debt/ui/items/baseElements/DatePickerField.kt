@@ -1,4 +1,4 @@
-package com.example.debt.ui.items
+package com.example.debt.ui.items.baseElements
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,27 +31,20 @@ fun DatePickerField(
     var showDatePicker by remember { mutableStateOf(false) }
 
     Box(modifier = modifier.fillMaxWidth()) {
-        OutlinedTextField(
+        DebtOutlinedTextField(
+            color = color,
             value = date,
             onValueChange = {},
-            label = { Text(label) },
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true,
+            label = label,
             trailingIcon = {
                 Icon(
                     Icons.Default.DateRange, contentDescription = "Выбрать дату",
                     tint = color ?: AppColors.accentPrimary
                 )
             },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = color ?: AppColors.accentPrimary,
-                unfocusedLabelColor = color ?: AppColors.accentPrimary,
-                focusedBorderColor = color ?: AppColors.accentPrimary,
-                unfocusedBorderColor = color ?: AppColors.accentPrimary,
-            ),
         )
 
-        // Невидимая поверхность для клика
         Box(
             modifier = Modifier
                 .matchParentSize()

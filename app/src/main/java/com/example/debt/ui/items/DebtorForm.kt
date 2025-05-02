@@ -4,10 +4,8 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.debt.data.model.Debtor
-import com.example.debt.ui.items.DatePickerField
+import com.example.debt.ui.items.baseElements.DatePickerField
+import com.example.debt.ui.items.baseElements.DebtOutlinedTextField
+import com.example.debt.ui.items.baseElements.DebtRadioButton
+import com.example.debt.ui.items.baseElements.DebtTextButton
 import com.example.debt.utils.AppColors
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -43,17 +44,11 @@ fun DebtorForm(
             .background(AppColors.background)
             .padding(16.dp)
     ) {
-        OutlinedTextField(
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = color ?: AppColors.textPrimary,
-                unfocusedLabelColor = color ?: AppColors.textPrimary,
-                focusedBorderColor = color ?: AppColors.textPrimary,
-                unfocusedBorderColor = color ?: AppColors.textPrimary,
-            ),
+        DebtOutlinedTextField(
+            color = color,
             value = name.value,
             onValueChange = { name.value = it },
-            label = { Text("Имя должника") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Имя должника",
         )
 
         Row(
@@ -61,85 +56,42 @@ fun DebtorForm(
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                RadioButton(
-                    selected = !isMineState.value,
-                    onClick = { isMineState.value = false },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = color ?: AppColors.accentPrimary,
-                        unselectedColor = AppColors.surface
-                    )
-                )
-                Text(
-                    text = "Мне должны",
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                        .clickable {
-                            isMineState.value = false
-                        },
-                    color = if (!isMineState.value) AppColors.textPrimary else AppColors.divider
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                RadioButton(
-                    selected = isMineState.value,
-                    onClick = { isMineState.value = true },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = color ?: AppColors.accentPrimary,
-                        unselectedColor = AppColors.surface
-                    )
-                )
-                Text(
-                    text = "Я должен",
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                        .clickable {
-                            isMineState.value = true
-                        },
-                    color = if (isMineState.value) AppColors.textPrimary else AppColors.divider
-                )
-            }
+            DebtRadioButton(
+                selected = !isMineState.value,
+                onClick = { isMineState.value = false },
+                color = color,
+                text = "Мне должны"
+            )
+
+            DebtRadioButton(
+                selected = isMineState.value,
+                onClick = { isMineState.value = true },
+                color = color,
+                text = "Я должен"
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = color ?: AppColors.textPrimary,
-                unfocusedLabelColor = color ?: AppColors.textPrimary,
-                focusedBorderColor = color ?: AppColors.textPrimary,
-                unfocusedBorderColor = color ?: AppColors.textPrimary,
-            ),
+        DebtOutlinedTextField(
+            color = color,
             value = telegramNick.value,
             onValueChange = { telegramNick.value = it },
-            label = { Text("Ник в Telegram (для перехода в приложение)") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Ник в Telegram (для перехода в приложение)",
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = color ?: AppColors.textPrimary,
-                unfocusedLabelColor = color ?: AppColors.textPrimary,
-                focusedBorderColor = color ?: AppColors.textPrimary,
-                unfocusedBorderColor = color ?: AppColors.textPrimary,
-            ),
+        DebtOutlinedTextField(
+            color = color,
             value = debtAmount.value,
             onValueChange = {
                 debtAmount.value = it
                     .trim()
                     .replace("-", "")
             },
-            label = { Text("Сумма долга") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
+            label = "Сумма долга",
+            keyboardType = KeyboardType.Number
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -151,23 +103,22 @@ fun DebtorForm(
             onDateChanged = { returnDate.value = it }
         )
 
-        OutlinedTextField(
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = color ?: AppColors.textPrimary,
-                unfocusedLabelColor = color ?: AppColors.textPrimary,
-                focusedBorderColor = color ?: AppColors.textPrimary,
-                unfocusedBorderColor = color ?: AppColors.textPrimary,
-            ),
+        DebtOutlinedTextField(
+            color = color,
             value = comment.value,
             onValueChange = { comment.value = it },
-            label = { Text("Комментарий (необязательно)") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Комментарий (необязательно)",
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
+        DebtTextButton(
+            color = color,
+            modifier = Modifier.fillMaxWidth(),
+            text = "Сохранить",
+            enabled = name.value.isNotBlank() && debtAmount.value.toDoubleOrNull() != null,
+        ) {
+            {
                 if (isEdit) {
                     val debtor = Debtor(
                         id = debtor.id,
@@ -191,17 +142,7 @@ fun DebtorForm(
                     )
                     onSaveComplete(debtor)
                 }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = name.value.isNotBlank() && debtAmount.value.toDoubleOrNull() != null,
-            colors = ButtonColors(
-                contentColor = AppColors.background,
-                disabledContentColor = AppColors.background,
-                disabledContainerColor = color ?: AppColors.surface,
-                containerColor = color ?: AppColors.accentPrimary,
-            )
-        ) {
-            Text("Сохранить")
+            }
         }
     }
 }
