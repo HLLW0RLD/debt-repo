@@ -13,6 +13,8 @@ object PreferenceCache {
     )
 
     private const val SELECTED_THEME: String = "selected_theme"
+    private const val AUTO_SETTLE_DEBTS: String = "auto_settle_debts"
+    private const val AUTO_DELETE_EMPTY_DEBTS: String = "auto_delete_empty_debts"
 
     @set:Synchronized
     var themeChanged = mutableStateOf(0)
@@ -29,6 +31,20 @@ object PreferenceCache {
         set(value) {
             prefs.edit().putString(SELECTED_THEME, value.name).apply()
             themeChanged.value++
+        }
+
+    @set:Synchronized
+    var autoSettleDebts: Boolean
+        get() =  prefs.getBoolean(AUTO_SETTLE_DEBTS, true)
+        set(value) {
+            prefs.edit().putBoolean(AUTO_SETTLE_DEBTS, value).apply()
+        }
+
+    @set:Synchronized
+    var autoDeleteEmptyDebts: Boolean
+        get() =  prefs.getBoolean(AUTO_DELETE_EMPTY_DEBTS, true)
+        set(value) {
+            prefs.edit().putBoolean(AUTO_DELETE_EMPTY_DEBTS, value).apply()
         }
 
     val isColoredTheme get() = selectedTheme == ThemeMode.COLOR

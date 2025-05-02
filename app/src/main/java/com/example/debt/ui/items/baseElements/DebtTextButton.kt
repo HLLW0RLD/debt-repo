@@ -24,7 +24,7 @@ fun DebtTextButton(
     Button(
         colors = ButtonDefaults.buttonColors(
             containerColor = color ?: AppColors.accentPrimary,
-            disabledContainerColor = color ?: AppColors.accentPrimary,
+            disabledContainerColor = color ?: AppColors.surface,
         ),
         onClick = {
             onClick()

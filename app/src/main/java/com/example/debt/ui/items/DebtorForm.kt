@@ -118,30 +118,28 @@ fun DebtorForm(
             text = "Сохранить",
             enabled = name.value.isNotBlank() && debtAmount.value.toDoubleOrNull() != null,
         ) {
-            {
-                if (isEdit) {
-                    val debtor = Debtor(
-                        id = debtor.id,
-                        isMine = isMineState.value,
-                        telegramNick = if (telegramNick.value.isNotEmpty()) telegramNick.value else debtor.telegramNick,
-                        name = if (name.value.isNotEmpty()) name.value else debtor.name,
-                        debtAmount = debtor.debtAmount,
-                        returnDate = if (returnDate.value.isNotEmpty()) returnDate.value else debtor.returnDate,
-                        comment = if (comment.value.isNotEmpty()) comment.value else debtor.comment
-                    )
-                    onSaveComplete(debtor)
-                } else {
-                    val amount = debtAmount.value.toDoubleOrNull() ?: 0.0
-                    val debtor = Debtor(
-                        telegramNick = telegramNick.value,
-                        isMine = isMineState.value,
-                        name = name.value,
-                        debtAmount = amount,
-                        returnDate = returnDate.value,
-                        comment = comment.value
-                    )
-                    onSaveComplete(debtor)
-                }
+            if (isEdit) {
+                val debtor = Debtor(
+                    id = debtor.id,
+                    isMine = isMineState.value,
+                    telegramNick = if (telegramNick.value.isNotEmpty()) telegramNick.value else debtor.telegramNick,
+                    name = if (name.value.isNotEmpty()) name.value else debtor.name,
+                    debtAmount = debtor.debtAmount,
+                    returnDate = if (returnDate.value.isNotEmpty()) returnDate.value else debtor.returnDate,
+                    comment = if (comment.value.isNotEmpty()) comment.value else debtor.comment
+                )
+                onSaveComplete(debtor)
+            } else {
+                val amount = debtAmount.value.toDoubleOrNull() ?: 0.0
+                val debtor = Debtor(
+                    telegramNick = telegramNick.value,
+                    isMine = isMineState.value,
+                    name = name.value,
+                    debtAmount = amount,
+                    returnDate = returnDate.value,
+                    comment = comment.value
+                )
+                onSaveComplete(debtor)
             }
         }
     }

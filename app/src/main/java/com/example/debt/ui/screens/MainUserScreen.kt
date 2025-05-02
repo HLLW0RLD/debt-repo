@@ -209,9 +209,9 @@ fun MainUserScreen() {
                         showPaymentDialog = false
                         editedDebtorBGcolor = null
                                 },
-                    onPayment = { amount, isAddition ->
+                    onPayment = { amount, isDebt ->
                         debtor.let { debtor ->
-                            if (isAddition) {
+                            if (isDebt) {
                                 viewModel.addDebt(debtor.id, amount)
                             } else {
                                 viewModel.payDebt(debtor.id, amount)

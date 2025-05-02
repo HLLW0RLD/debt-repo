@@ -6,6 +6,8 @@ import com.example.debt.data.model.Debtor
 import com.example.debt.app.data.repo.LocalRepository
 import com.example.debt.data.model.Transaction
 import com.example.debt.data.model.TransactionType
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
@@ -18,7 +20,7 @@ class DebtorViewModel(private val repository: LocalRepository) : ViewModel(), Ko
                 amount = debtor.debtAmount,
                 type = TransactionType.DEBT,
                 date = debtor.loanDate,
-                comment = "Первоначальный долг",
+                comment = "Первоначальный долг\n${debtor.comment}",
                 id = debtor.id
             )
 
