@@ -22,7 +22,6 @@ object PreferenceCache {
 
     val isColoredTheme get() = selectedTheme == ThemeMode.COLOR
     val isDarkTheme get() = selectedTheme == ThemeMode.DARK
-    val isSystemTheme get() = selectedTheme == ThemeMode.SYSTEM
 
     @set:Synchronized
     var selectedTheme: ThemeMode

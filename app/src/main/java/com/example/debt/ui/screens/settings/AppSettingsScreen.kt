@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import com.example.debt.R
 import com.example.debt.ui.items.baseElements.DebtRadioButton
 import com.example.debt.utils.AppColors
-import com.example.debt.utils.PreferenceCache
 import com.example.debt.utils.ThemeMode
 import org.koin.androidx.compose.koinViewModel
 
@@ -41,6 +39,7 @@ fun AppSettingsScreen(
 
     val debtAutoCount by viewModel.autoCountDebts.collectAsState()
     val debtAutoDelete by viewModel.debtAutoDelete.collectAsState()
+    val selectedTheme by viewModel.selectedTheme.collectAsState()
 
     Column(
         modifier = Modifier
@@ -79,7 +78,7 @@ fun AppSettingsScreen(
         ) {
             Text(
                 text = "Выбор темы",
-                style = MaterialTheme.typography.titleMedium,
+                color = AppColors.textPrimary,
                 modifier = Modifier.padding(8.dp)
             )
 
@@ -87,7 +86,7 @@ fun AppSettingsScreen(
 
             ThemeOption(
                 text = "Системная",
-                selected = PreferenceCache.isSystemTheme,
+                selected = selectedTheme == ThemeMode.SYSTEM,
                 onClick = {
                     viewModel.setTheme(ThemeMode.SYSTEM)
                 }
@@ -95,7 +94,7 @@ fun AppSettingsScreen(
 
             ThemeOption(
                 text = "Светлая",
-                selected = !PreferenceCache.isDarkTheme,
+                selected = selectedTheme == ThemeMode.LIGHT,
                 onClick = {
                     viewModel.setTheme(ThemeMode.LIGHT)
                 }
@@ -103,7 +102,7 @@ fun AppSettingsScreen(
 
             ThemeOption(
                 text = "Темная",
-                selected = PreferenceCache.isDarkTheme,
+                selected = selectedTheme == ThemeMode.DARK,
                 onClick = {
                     viewModel.setTheme(ThemeMode.DARK)
                 }
@@ -111,7 +110,7 @@ fun AppSettingsScreen(
 
             ThemeOption(
                 text = "Цветная",
-                selected = PreferenceCache.isColoredTheme,
+                selected = selectedTheme == ThemeMode.COLOR,
                 onClick = {
                     viewModel.setTheme(ThemeMode.COLOR)
                 }
@@ -129,7 +128,7 @@ fun AppSettingsScreen(
         ) {
             Text(
                 text = "Рассчет долгов",
-                style = MaterialTheme.typography.titleMedium,
+                color = AppColors.textPrimary,
                 modifier = Modifier.padding(8.dp)
             )
 
