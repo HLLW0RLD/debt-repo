@@ -4,17 +4,56 @@ import com.example.debt.data.model.Debtor
 import com.example.debt.app.data.db.DebtorDao
 import com.example.debt.app.utils.LogUtils.debugLog
 import com.example.debt.app.utils.LogUtils.errorLog
+import com.example.debt.data.model.Transaction
+import com.example.debt.data.model.TransactionType
+import com.example.debt.utils.PreferenceCache
+import com.example.debt.utils.getCurrentDateTime
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 
-class LocalRepositoryImpl(private val debtorDao: DebtorDao): LocalRepository {
+class LocalRepositoryImpl(private val debtorDao: DebtorDao) : LocalRepository {
 
     override val debtors: Flow<List<Debtor>> = debtorDao.getAllDebtors()
 
     override suspend fun insertDebtor(debtor: Debtor): Long {
         return try {
-            val id = debtorDao.insert(debtor)
-            debugLog("Inserted debtor [id=$id]: ${debtor.name} (${debtor.telegramNick})")
-            id
+            if (PreferenceCache.autoSettleDebts) {
+                val mutualDebt = debtorDao.findDebt(
+                    name = debtor.name,
+                    telegramNick = debtor.telegramNick,
+                    isMine = !debtor.isMine
+                )
+
+                mutualDebt?.let { existingDebt ->
+                    val amountToSettle = minOf(debtor.debtAmount, existingDebt.debtAmount)
+
+                    debtorDao.updateDebt(
+                        if (existingDebt.isMine)
+                            existingDebt.addDebt(amountToSettle)
+                        else
+                            existingDebt.addPayment(amountToSettle)
+                    )
+
+                    val remainingAmount = debtor.debtAmount - amountToSettle
+                    if (remainingAmount > 0) {
+                        val newDebtor = debtor.copy(debtAmount = remainingAmount)
+                        debtorDao.insert(newDebtor).also { id ->
+                            debugLog("Inserted debtor after settlement [id=$id]")
+                        }
+                    } else {
+                        debugLog("Debt fully settled with existing record")
+                        existingDebt.id
+                    }
+                } ?: run {
+                    debtorDao.insert(debtor).also { id ->
+                        debugLog("Inserted new debtor [id=$id]")
+                    }
+                }
+            } else {
+                debtorDao.insert(debtor).also { id ->
+                    debugLog("Inserted debtor with auto-settle off [id=$id]")
+                }
+            }
         } catch (e: Exception) {
             errorLog("Failed to insert debtor ${debtor.name}: ${e.message}")
             throw e
@@ -31,22 +70,81 @@ class LocalRepositoryImpl(private val debtorDao: DebtorDao): LocalRepository {
         }
     }
 
-    override suspend fun addDebt(debtorId: Long, newAmount: Double) {
+    override suspend fun addDebt(
+        debtorId: Long,
+        amount: Double
+    ) {
         val debtor = debtorDao.getDebtorById(debtorId) ?: return
+
         try {
-            debtorDao.updateDebt(debtor.addDebt(newAmount))
+            if (PreferenceCache.autoSettleDebts && debtor.isMine) {
+                val theirDebt = debtorDao.findDebt(
+                    name = debtor.name,
+                    telegramNick = debtor.telegramNick,
+                    isMine = false
+                )
+
+                theirDebt?.let { mutualDebt ->
+                    val amountToSettle = minOf(amount, mutualDebt.debtAmount)
+
+                    debtorDao.updateDebt(mutualDebt.addPayment(amountToSettle))
+
+                    val remaining = amount - amountToSettle
+                    if (remaining > 0) {
+                        debtorDao.updateDebt(debtor.addDebt(remaining))
+                    }
+                    return
+                }
+            }
+
+            debtorDao.updateDebt(debtor.addDebt(amount))
         } catch (e: Exception) {
-            errorLog("Failed to add debt ${e.message}")
+            errorLog("Failed to process debt addition: ${e.message}")
             throw e
         }
     }
 
-    override suspend fun payDebt(debtorId: Long, newAmount: Double) {
+    override suspend fun payDebt(
+        debtorId: Long,
+        amount: Double
+    ) {
         val debtor = debtorDao.getDebtorById(debtorId) ?: return
+
         try {
-            debtorDao.updateDebt(debtor.addPayment(newAmount))
+            when {
+                PreferenceCache.autoSettleDebts && !debtor.isMine -> {
+                    val matchDebt = debtorDao.findDebt(
+                        name = debtor.name,
+                        telegramNick = debtor.telegramNick,
+                        isMine = true
+                    )
+
+                    matchDebt?.let { newDebt ->
+                        val amountToSettle = minOf(amount, newDebt.debtAmount, debtor.debtAmount)
+
+                        debtorDao.updateDebt(newDebt.addPayment(amountToSettle))
+                        debtorDao.updateDebt(debtor.addPayment(amountToSettle))
+
+                        val remaining = amount - amountToSettle
+                        if (remaining > 0) {
+                            handleRemainingPayment(debtor, remaining)
+                        }
+                        return
+                    } ?: run {
+                        handleRemainingPayment(debtor, amount)
+                    }
+                }
+
+                amount > debtor.debtAmount -> {
+                    handleRemainingPayment(debtor, amount)
+                }
+
+                else -> {
+                    handleRemainingPayment(debtor, amount)
+                }
+            }
         } catch (e: Exception) {
-            errorLog("Failed to pay debt ${e.message}")
+            errorLog("Failed to process debt payment: ${e.message}")
             throw e
         }
     }
@@ -74,6 +172,53 @@ class LocalRepositoryImpl(private val debtorDao: DebtorDao): LocalRepository {
         } catch (e: Exception) {
             errorLog("Failed to delete debtor with id $id: ${e.message}")
             throw e
+        }
+    }
+
+    private suspend fun handleRemainingPayment(debtor: Debtor, amount: Double) {
+        if (amount > debtor.debtAmount) {
+            handleOverpayment(debtor, amount)
+        } else {
+            debtorDao.updateDebt(debtor.addPayment(amount))
+        }
+    }
+
+    private suspend fun handleOverpayment(debtor: Debtor, amount: Double) {
+        val overpayment = amount - debtor.debtAmount
+
+        val updatedDebtor = debtor.addPayment(debtor.debtAmount)
+        debtorDao.updateDebt(updatedDebtor)
+
+        if (PreferenceCache.autoDeleteEmptyDebts) {
+            deleteEmpty(updatedDebtor)
+        }
+
+        val reverseDebtor = Debtor(
+            name = debtor.name,
+            telegramNick = debtor.telegramNick,
+            isMine = !debtor.isMine,
+            debtAmount = overpayment,
+            comment = "Автоматически создано при переплате\n${debtor.comment}",
+            transactionsJson = Gson().toJson(mutableListOf(
+                Transaction(
+                    id = 0,
+                    amount = overpayment,
+                    date = getCurrentDateTime(),
+                    type = TransactionType.DEBT,
+                    comment = "Автоматически создано при переплате\n${debtor.comment}"
+                )
+            ))
+        )
+
+        // 3. Вставляем новую запись
+        debtorDao.insert(reverseDebtor)
+    }
+
+    private suspend fun deleteEmpty(debtor: Debtor) {
+        if (debtor.debtAmount == 0.0) {
+            debtorDao.deleteDebtor(debtor.id)
+        } else {
+            debtorDao.deleteZeroDebtors()
         }
     }
 }

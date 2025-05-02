@@ -1,18 +1,12 @@
 package com.example.debt.ui.items
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -40,7 +34,7 @@ fun PaymentDialog(
     onPayment: (Double, Boolean) -> Unit
 ) {
     var amount by remember { mutableStateOf("") }
-    var isAddition by remember { mutableStateOf(false) }
+    var isDebt by remember { mutableStateOf(false) }
 
     AlertDialog(
         containerColor = AppColors.background,
@@ -78,16 +72,16 @@ fun PaymentDialog(
                 ) {
                     Spacer(Modifier.width(16.dp))
                     DebtRadioButton(
-                        selected = !isAddition,
-                        onClick = { isAddition = false },
+                        selected = !isDebt,
+                        onClick = { isDebt = false },
                         color = color,
                         text = "Оплата займа"
                     )
 
                     Spacer(Modifier.width(16.dp))
                     DebtRadioButton(
-                        selected = isAddition,
-                        onClick = { isAddition = true },
+                        selected = isDebt,
+                        onClick = { isDebt = true },
                         color = color,
                         text = "Новый займ"
                     )
@@ -101,7 +95,7 @@ fun PaymentDialog(
                 enabled = amount.toDoubleOrNull() != null
             ) {
                 amount.toDoubleOrNull()?.let {
-                    onPayment(it, isAddition)
+                    onPayment(it, isDebt)
                     onDismiss()
                 }
             }

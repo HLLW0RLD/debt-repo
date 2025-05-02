@@ -19,21 +19,20 @@ data class Debtor(
     val debtAmount: Double,
     var loanDate: String = getCurrentDateTime(),
     @ColumnInfo(name = "transactions")
-    private var _transactions: String = "",
+    var transactionsJson: String = "",
     val returnDate: String = "", // опционально
     var comment: String = "" // опционально
 ) {
-    fun get_transactions(): String = _transactions
     var transactions: MutableList<Transaction>
         get() = try {
             val type: Type = object : TypeToken<MutableList<Transaction>>() {}.type
-            Gson().fromJson(_transactions, type) ?: mutableListOf()
+            Gson().fromJson(transactionsJson, type) ?: mutableListOf()
         } catch (e: Exception) {
             errorLog(e)
             mutableListOf()
         }
         set(value) {
-            _transactions = Gson().toJson(value)
+            transactionsJson = Gson().toJson(value)
         }
 
     fun addPayment(amount: Double): Debtor {
@@ -47,7 +46,7 @@ data class Debtor(
         val addTransactions = transactions + newTransaction
         return this.copy(
             debtAmount = debtAmount - amount,
-            _transactions = Gson().toJson(addTransactions)
+            transactionsJson = Gson().toJson(addTransactions)
         )
     }
 
@@ -62,7 +61,7 @@ data class Debtor(
         val updatedTransactions = transactions + newTransaction
         return this.copy(
             debtAmount = debtAmount + amount,
-            _transactions = Gson().toJson(updatedTransactions)
+            transactionsJson = Gson().toJson(updatedTransactions)
         )
     }
 }

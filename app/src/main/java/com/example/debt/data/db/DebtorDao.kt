@@ -16,6 +16,19 @@ interface DebtorDao {
     @Query("SELECT * FROM debtors WHERE id = :id")
     suspend fun getDebtorById(id: Long): Debtor?
 
+    @Query("""
+        SELECT * FROM debtors 
+        WHERE name = :name 
+        AND telegramNick = :telegramNick
+        AND isMine = :isMine
+        LIMIT 1
+    """)
+    suspend fun findDebt(
+        name: String,
+        telegramNick: String,
+        isMine: Boolean
+    ): Debtor?
+
     @Update
     suspend fun updateDebt(debtor: Debtor)
 
@@ -30,4 +43,7 @@ interface DebtorDao {
 
     @Query("DELETE FROM debtors WHERE id = :id")
     suspend fun deleteDebtor(id: Long)
+
+    @Query("DELETE FROM debtors WHERE debtAmount = 0")
+    suspend fun deleteZeroDebtors()
 }

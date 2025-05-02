@@ -114,13 +114,15 @@ object AppColors {
 }
 
 fun cardColorById(id: Long): Color {
-    val index = abs(id.hashCode()) % (lightBGColors.size + darkBGColors.size)
-    return if (PreferenceCache.isDarkTheme) darkBGColors[index] else lightBGColors[index]
+    return if (PreferenceCache.isDarkTheme) {
+        darkBGColors[abs(id.hashCode()) % darkBGColors.size]
+    } else {
+        lightBGColors[abs(id.hashCode()) % lightBGColors.size]
+    }
 }
 
 fun interfaceColorById(id: Long): Color {
-    val index = abs(id.hashCode()) % (lightBGColors.size + darkBGColors.size)
-    return darkBGColors[index]
+    return darkBGColors[abs(id.hashCode()) % darkBGColors.size]
 }
 
 private val YellowPrimary = Color(0xFFFFC107)
