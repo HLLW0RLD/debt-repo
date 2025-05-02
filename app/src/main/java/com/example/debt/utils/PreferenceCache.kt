@@ -20,6 +20,10 @@ object PreferenceCache {
     var themeChanged = mutableStateOf(0)
         private set
 
+    val isColoredTheme get() = selectedTheme == ThemeMode.COLOR
+    val isDarkTheme get() = selectedTheme == ThemeMode.DARK
+    val isSystemTheme get() = selectedTheme == ThemeMode.SYSTEM
+
     @set:Synchronized
     var selectedTheme: ThemeMode
         get() = try {
@@ -34,19 +38,13 @@ object PreferenceCache {
         }
 
     @set:Synchronized
-    var autoSettleDebts: Boolean
-        get() =  prefs.getBoolean(AUTO_SETTLE_DEBTS, true)
-        set(value) {
-            prefs.edit().putBoolean(AUTO_SETTLE_DEBTS, value).apply()
-        }
+    var autoCountDebts: Boolean
+        get() { return prefs.getBoolean(AUTO_SETTLE_DEBTS, true) }
+        set(value) { prefs.edit().putBoolean(AUTO_SETTLE_DEBTS, value )?.apply() }
 
     @set:Synchronized
     var autoDeleteEmptyDebts: Boolean
-        get() =  prefs.getBoolean(AUTO_DELETE_EMPTY_DEBTS, true)
-        set(value) {
-            prefs.edit().putBoolean(AUTO_DELETE_EMPTY_DEBTS, value).apply()
-        }
+        get() { return prefs.getBoolean(AUTO_DELETE_EMPTY_DEBTS, true) }
+        set(value) { prefs.edit().putBoolean(AUTO_DELETE_EMPTY_DEBTS, value )?.apply() }
 
-    val isColoredTheme get() = selectedTheme == ThemeMode.COLOR
-    val isDarkTheme get() = selectedTheme == ThemeMode.DARK
 }

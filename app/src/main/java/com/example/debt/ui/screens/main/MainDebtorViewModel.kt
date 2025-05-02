@@ -1,17 +1,15 @@
-package com.example.debt.app.ui.screens
+package com.example.debt.ui.screens.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.debt.data.model.Debtor
 import com.example.debt.app.data.repo.LocalRepository
+import com.example.debt.data.model.Debtor
 import com.example.debt.data.model.Transaction
 import com.example.debt.data.model.TransactionType
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
-class DebtorViewModel(private val repository: LocalRepository) : ViewModel(), KoinComponent {
+class MainDebtorViewModel(private val repository: LocalRepository) : ViewModel(), KoinComponent {
     val debtors = repository.debtors
 
     fun insertDebtor(debtor: Debtor) {

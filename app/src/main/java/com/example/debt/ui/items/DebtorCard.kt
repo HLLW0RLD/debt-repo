@@ -153,7 +153,7 @@ fun DebtorCard(
 
                 Icon(
                     contentDescription = "",
-                    painter = painterResource(if (showHistory) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up),
+                    painter = painterResource(if (showHistory) R.drawable.ic_double_arrow_down else R.drawable.ic_double_arrow_up),
                     tint = AppColors.textPrimary
                 )
             }

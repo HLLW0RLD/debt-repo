@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,7 +50,7 @@ import com.example.debt.app.ui.items.DebtorCard
 import com.example.debt.app.ui.items.DebtorForm
 import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.SimpleDebtDialog
-import com.example.debt.ui.items.ThemeSelectionDialog
+import com.example.debt.ui.screens.main.MainDebtorViewModel
 import com.example.debt.utils.AppColors
 import com.example.debt.utils.PreferenceCache
 import com.example.debt.utils.interfaceColorById
@@ -58,8 +59,10 @@ import org.koin.androidx.compose.koinViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainUserScreen() {
-    val viewModel: DebtorViewModel = koinViewModel()
+fun MainUserScreen(
+    onSettingsClick: () -> Unit
+) {
+    val viewModel: MainDebtorViewModel = koinViewModel()
 
     val debtors by viewModel.debtors.collectAsState(initial = emptyList())
 
@@ -102,11 +105,12 @@ fun MainUserScreen() {
         Column {
             Spacer(Modifier.size(50.dp))
             Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .background(AppColors.background)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
             ) {
-                Spacer(Modifier.size(12.dp))
                 Text(
                     text = "debt",
                     fontSize = 48.sp,
@@ -114,6 +118,13 @@ fun MainUserScreen() {
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable { showThemeDialog = true }
                 )
+                IconButton(onClick = onSettingsClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_shelves_horizontal),
+                        tint = AppColors.textPrimary,
+                        contentDescription = "",
+                    )
+                }
             }
             Divider(Modifier
                 .fillMaxWidth()
@@ -230,12 +241,6 @@ fun MainUserScreen() {
                     viewModel.deleteDebtor(selectedDebtor!!.id)
                     showDeleteDialog = false
                 }
-            )
-        }
-
-        if (showThemeDialog) {
-            ThemeSelectionDialog(
-                onDismissRequest = { showThemeDialog = false }
             )
         }
 

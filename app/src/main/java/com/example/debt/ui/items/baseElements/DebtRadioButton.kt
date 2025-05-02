@@ -42,7 +42,7 @@ fun DebtRadioButton(
         )
         Text(
             text = text,
-            color = if (selected) AppColors.textPrimary else AppColors.divider
+            color = if (selected) AppColors.textPrimary else AppColors.textSecondary
         )
     }
 }

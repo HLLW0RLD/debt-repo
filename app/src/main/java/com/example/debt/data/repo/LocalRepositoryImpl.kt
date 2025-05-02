@@ -17,7 +17,7 @@ class LocalRepositoryImpl(private val debtorDao: DebtorDao) : LocalRepository {
 
     override suspend fun insertDebtor(debtor: Debtor): Long {
         return try {
-            if (PreferenceCache.autoSettleDebts) {
+            if (PreferenceCache.autoCountDebts) {
                 val mutualDebt = debtorDao.findDebt(
                     name = debtor.name,
                     telegramNick = debtor.telegramNick,
@@ -77,7 +77,7 @@ class LocalRepositoryImpl(private val debtorDao: DebtorDao) : LocalRepository {
         val debtor = debtorDao.getDebtorById(debtorId) ?: return
 
         try {
-            if (PreferenceCache.autoSettleDebts && debtor.isMine) {
+            if (PreferenceCache.autoCountDebts && debtor.isMine) {
                 val theirDebt = debtorDao.findDebt(
                     name = debtor.name,
                     telegramNick = debtor.telegramNick,
@@ -112,7 +112,7 @@ class LocalRepositoryImpl(private val debtorDao: DebtorDao) : LocalRepository {
 
         try {
             when {
-                PreferenceCache.autoSettleDebts && !debtor.isMine -> {
+                PreferenceCache.autoCountDebts && !debtor.isMine -> {
                     val matchDebt = debtorDao.findDebt(
                         name = debtor.name,
                         telegramNick = debtor.telegramNick,
