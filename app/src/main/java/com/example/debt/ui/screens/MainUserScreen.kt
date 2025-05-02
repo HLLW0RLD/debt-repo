@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -53,6 +51,8 @@ import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.SimpleDebtDialog
 import com.example.debt.ui.items.ThemeSelectionDialog
 import com.example.debt.utils.AppColors
+import com.example.debt.utils.PreferenceCache
+import com.example.debt.utils.interfaceColorById
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -163,12 +163,13 @@ fun MainUserScreen() {
                             selectedDebtor = it
                             showDeleteDialog = true
                         },
-                        onPaymentClick = {
-                            selectedDebtor = it
+                        onPaymentClick = { debtor ->
+                            editedDebtorBGcolor = if (PreferenceCache.isColoredTheme) interfaceColorById(debtor.id) else null
+                            selectedDebtor = debtor
                             showPaymentDialog = true
                         },
-                        onEditClick = { debtor, color ->
-                            editedDebtorBGcolor = color
+                        onEditClick = { debtor ->
+                            editedDebtorBGcolor = if (PreferenceCache.isColoredTheme) interfaceColorById(debtor.id) else null
                             editedDebtor = debtor
                             isMineDebtsState = debtor.isMine
                             showBottomSheet = true
@@ -200,19 +201,25 @@ fun MainUserScreen() {
         }
 
         if (showPaymentDialog) {
-            PaymentDialog(
-                debtor = selectedDebtor,
-                onDismiss = { showPaymentDialog = false },
-                onPayment = { amount, isAddition ->
-                    selectedDebtor?.let { debtor ->
-                        if (isAddition) {
-                            viewModel.addDebt(debtor.id, amount)
-                        } else {
-                            viewModel.payDebt(debtor.id, amount)
+            selectedDebtor?.let { debtor ->
+                PaymentDialog(
+                    debtor = debtor,
+                    color = editedDebtorBGcolor,
+                    onDismiss = {
+                        showPaymentDialog = false
+                        editedDebtorBGcolor = null
+                                },
+                    onPayment = { amount, isAddition ->
+                        debtor.let { debtor ->
+                            if (isAddition) {
+                                viewModel.addDebt(debtor.id, amount)
+                            } else {
+                                viewModel.payDebt(debtor.id, amount)
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         }
 
         if (showDeleteDialog) {

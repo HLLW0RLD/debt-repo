@@ -147,6 +147,7 @@ fun DebtorForm(
         DatePickerField(
             label = "Дата возврата",
             date = returnDate.value,
+            color = color,
             onDateChanged = { returnDate.value = it }
         )
 
