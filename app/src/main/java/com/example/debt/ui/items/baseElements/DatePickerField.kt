@@ -16,7 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import com.example.debt.utils.AppColors
+import com.example.debt.ui.theme.AppColors
 import com.example.debt.utils.getCurrentDateTime
 
 @RequiresApi(Build.VERSION_CODES.O)

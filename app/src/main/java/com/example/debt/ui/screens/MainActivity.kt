@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.debt.app.ui.screens.MainUserScreen
 import com.example.debt.ui.screens.navigation.Screen
 import com.example.debt.ui.screens.settings.AppSettingsScreen
-import com.example.debt.utils.AppTheme
+import com.example.debt.ui.theme.AppTheme
 
 @RequiresApi(Build.VERSION_CODES.O)
 class MainActivity : ComponentActivity() {

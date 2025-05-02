@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.example.debt.data.model.Debtor
 import com.example.debt.ui.items.baseElements.DebtRadioButton
 import com.example.debt.ui.items.baseElements.DebtTextButton
-import com.example.debt.utils.AppColors
+import com.example.debt.ui.theme.AppColors
 
 @Composable
 fun PaymentDialog(

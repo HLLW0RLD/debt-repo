@@ -3,10 +3,8 @@ package com.example.debt.app.ui.items
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +16,7 @@ import com.example.debt.ui.items.baseElements.DatePickerField
 import com.example.debt.ui.items.baseElements.DebtOutlinedTextField
 import com.example.debt.ui.items.baseElements.DebtRadioButton
 import com.example.debt.ui.items.baseElements.DebtTextButton
-import com.example.debt.utils.AppColors
+import com.example.debt.ui.theme.AppColors
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

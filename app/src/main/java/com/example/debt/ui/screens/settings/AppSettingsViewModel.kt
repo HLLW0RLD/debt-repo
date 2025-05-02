@@ -2,7 +2,7 @@ package com.example.debt.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
 import com.example.debt.utils.PreferenceCache
-import com.example.debt.utils.ThemeMode
+import com.example.debt.ui.theme.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.KoinComponent

@@ -1,7 +1,5 @@
 package com.example.debt.ui.items.baseElements
 
-import android.graphics.drawable.shapes.Shape
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
-import com.example.debt.utils.AppColors
+import com.example.debt.ui.theme.AppColors
 
 @Composable
 fun DebtOutlinedTextField(

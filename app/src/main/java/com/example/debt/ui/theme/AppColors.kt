@@ -1,71 +1,11 @@
-package com.example.debt.utils
+package com.example.debt.ui.theme
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import kotlin.math.abs
-
-
-val lightBGColors = listOf(
-    Color(0xFFF8BBD0), // light pink
-    Color(0xFFD1C4E9), // light purple
-    Color(0xFFBBDEFB), // light blue
-    Color(0xFFB2EBF2), // light cyan
-    Color(0xFFB2DFDB), // light teal
-    Color(0xFFC8E6C9), // light green
-    Color(0xFFF0F4C3), // light lime
-    Color(0xFFFFF9C4), // light yellow
-    Color(0xFFFFE0B2), // light orange
-    Color(0xFFFFCCBC), // light deep orange
-    Color(0xFFE1BEE7), // light light purple
-    Color(0xFFCFD8DC)  // light blue grey
-)
-
-val darkBGColors = listOf(
-    Color(0xFFD17F94), // dusty rose
-    Color(0xFFA58CC9), // muted purple
-    Color(0xFF7FA8D1), // denim blue
-    Color(0xFF7DB8C0), // teal grey
-    Color(0xFF7FAFA7), // slate teal
-    Color(0xFF96BFA4), // sage green
-    Color(0xFFC5C78D), // olive sand
-    Color(0xFFD9C87B), // golden sand
-    Color(0xFFD9B17D), // amber sand
-    Color(0xFFD99E8A), // terracotta
-    Color(0xFFB58CC2), // dusty lavender
-    Color(0xFF9FAFBA)  // storm grey
-)
-
-enum class ThemeMode {
-    SYSTEM, LIGHT, DARK, COLOR
-}
-
-@SuppressLint("RememberReturnType")
-@Composable
-fun AppTheme(
-    isSystemDark: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
-) {
-
-    val colorScheme = remember(PreferenceCache.themeChanged.value) {
-        when (PreferenceCache.selectedTheme) {
-            ThemeMode.COLOR -> if (isSystemDark) DarkRandomColorScheme else LightRandomColorScheme
-            ThemeMode.SYSTEM -> if (isSystemDark) DarkColorScheme else LightColorScheme
-            ThemeMode.DARK -> DarkColorScheme
-            ThemeMode.LIGHT -> LightColorScheme
-        }
-    }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content
-    )
-}
 
 object AppColors {
 
@@ -113,23 +53,11 @@ object AppColors {
         }
 }
 
-fun cardColorById(id: Long): Color {
-    return if (PreferenceCache.isDarkTheme) {
-        darkBGColors[abs(id.hashCode()) % darkBGColors.size]
-    } else {
-        lightBGColors[abs(id.hashCode()) % lightBGColors.size]
-    }
-}
+val YellowPrimary = Color(0xFFFFC107)
+val YellowSecondary = Color(0xFFFFA000)
+val YellowTertiary = Color(0xFFFFD54F)
 
-fun interfaceColorById(id: Long): Color {
-    return darkBGColors[abs(id.hashCode()) % darkBGColors.size]
-}
-
-private val YellowPrimary = Color(0xFFFFC107)
-private val YellowSecondary = Color(0xFFFFA000)
-private val YellowTertiary = Color(0xFFFFD54F)
-
-private val LightColorScheme = lightColorScheme(
+val LightColorScheme = lightColorScheme(
     primary = YellowPrimary,
     primaryContainer = YellowTertiary,
     secondary = YellowSecondary,
@@ -145,7 +73,7 @@ private val LightColorScheme = lightColorScheme(
     onError = Color(0xFFFFFFFF)
 )
 
-private val DarkColorScheme = darkColorScheme(
+val DarkColorScheme = darkColorScheme(
     primary = YellowPrimary,
     primaryContainer = YellowSecondary,
     secondary = YellowTertiary,
@@ -161,7 +89,7 @@ private val DarkColorScheme = darkColorScheme(
     onError = Color(0xFF000000)
 )
 
-private val LightRandomColorScheme = lightColorScheme(
+val LightRandomColorScheme = lightColorScheme(
     primary = YellowPrimary,
     primaryContainer = YellowTertiary,
     secondary = YellowSecondary,
@@ -177,7 +105,7 @@ private val LightRandomColorScheme = lightColorScheme(
     onError = Color(0xFFFFFFFF)
 )
 
-private val DarkRandomColorScheme = darkColorScheme(
+val DarkRandomColorScheme = darkColorScheme(
     primary = YellowPrimary,
     primaryContainer = YellowSecondary,
     secondary = YellowTertiary,

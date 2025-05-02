@@ -42,10 +42,10 @@ import androidx.compose.ui.unit.dp
 import com.example.debt.R
 import com.example.debt.data.model.Debtor
 import com.example.debt.data.model.TransactionType
-import com.example.debt.utils.AppColors
+import com.example.debt.ui.theme.AppColors
 import com.example.debt.utils.PreferenceCache
-import com.example.debt.utils.ThemeMode
-import com.example.debt.utils.cardColorById
+import com.example.debt.ui.theme.ThemeMode
+import com.example.debt.ui.theme.cardColorById
 import com.example.debt.utils.openTelegramChat
 import com.example.debt.utils.setColorDate
 

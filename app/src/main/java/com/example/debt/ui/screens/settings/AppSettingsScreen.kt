@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.debt.R
 import com.example.debt.ui.items.baseElements.DebtRadioButton
-import com.example.debt.utils.AppColors
-import com.example.debt.utils.ThemeMode
+import com.example.debt.ui.theme.AppColors
+import com.example.debt.ui.theme.ThemeMode
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

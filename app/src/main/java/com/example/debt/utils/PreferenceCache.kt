@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateOf
 import com.example.debt.App
 import com.example.debt.app.utils.LogUtils.errorLog
+import com.example.debt.ui.theme.ThemeMode
 
 object PreferenceCache {
     private val prefs: SharedPreferences = App.appInstance.getSharedPreferences(

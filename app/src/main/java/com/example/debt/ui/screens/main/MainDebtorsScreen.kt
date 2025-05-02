@@ -51,9 +51,9 @@ import com.example.debt.app.ui.items.DebtorForm
 import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.SimpleDebtDialog
 import com.example.debt.ui.screens.main.MainDebtorViewModel
-import com.example.debt.utils.AppColors
+import com.example.debt.ui.theme.AppColors
 import com.example.debt.utils.PreferenceCache
-import com.example.debt.utils.interfaceColorById
+import com.example.debt.ui.theme.interfaceColorById
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)

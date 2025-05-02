@@ -2,14 +2,13 @@ package com.example.debt.ui.items.baseElements
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.magnifier
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.debt.utils.AppColors
+import com.example.debt.ui.theme.AppColors
 
 @Composable
 fun DebtTextButton(
