@@ -2,21 +2,12 @@ package com.example.debt.utils
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import com.example.debt.utils.ThemeMode
 import kotlin.math.abs
 
 
@@ -78,6 +69,9 @@ fun AppTheme(
 
 object AppColors {
 
+    val tertiary: Color
+        @Composable get() = MaterialTheme.colorScheme.tertiary
+
     val textPrimary: Color
         @Composable get() = MaterialTheme.colorScheme.onBackground
     val textSecondary: Color
@@ -119,9 +113,14 @@ object AppColors {
         }
 }
 
-fun generateColorScheme(id: Long, isSystemInDarkTheme: Boolean): Color {
+fun cardColorById(id: Long): Color {
     val index = abs(id.hashCode()) % (lightBGColors.size + darkBGColors.size)
-    return if (isSystemInDarkTheme) darkBGColors[index] else lightBGColors[index]
+    return if (PreferenceCache.isDarkTheme) darkBGColors[index] else lightBGColors[index]
+}
+
+fun interfaceColorById(id: Long): Color {
+    val index = abs(id.hashCode()) % (lightBGColors.size + darkBGColors.size)
+    return darkBGColors[index]
 }
 
 private val YellowPrimary = Color(0xFFFFC107)
@@ -133,7 +132,7 @@ private val LightColorScheme = lightColorScheme(
     primaryContainer = YellowTertiary,
     secondary = YellowSecondary,
     secondaryContainer = YellowTertiary,
-    tertiary = Color(0xFF424242),
+    tertiary = Color(0xFFBDBDBD),
     background = Color(0xFFFFFFFF),
     surface = Color(0xFFE7E7E7),
     error = Color(0xFFB00020),
@@ -149,7 +148,7 @@ private val DarkColorScheme = darkColorScheme(
     primaryContainer = YellowSecondary,
     secondary = YellowTertiary,
     secondaryContainer = YellowSecondary,
-    tertiary = Color(0xFFBDBDBD),
+    tertiary = Color(0xFF424242),
     background = Color(0xFF121212),
     surface = Color(0xFF1E1E1E),
     error = Color(0xFFB00020),
@@ -165,7 +164,7 @@ private val LightRandomColorScheme = lightColorScheme(
     primaryContainer = YellowTertiary,
     secondary = YellowSecondary,
     secondaryContainer = YellowTertiary,
-    tertiary = Color(0xFF424242),
+    tertiary = Color(0xFFBDBDBD),
     background = Color(0xFFFFFFFF),
     surface = Color(0xFFE7E7E7),
     error = Color(0xFFB00020),
@@ -181,7 +180,7 @@ private val DarkRandomColorScheme = darkColorScheme(
     primaryContainer = YellowSecondary,
     secondary = YellowTertiary,
     secondaryContainer = YellowSecondary,
-    tertiary = Color(0xFFBDBDBD),
+    tertiary = Color(0xFF424242),
     background = Color(0xFF121212),
     surface = Color(0xFF1E1E1E),
     error = Color(0xFFB00020),

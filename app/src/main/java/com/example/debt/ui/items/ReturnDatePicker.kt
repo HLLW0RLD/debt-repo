@@ -3,6 +3,7 @@ package com.example.debt.ui.items
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -10,6 +11,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
+import com.example.debt.utils.AppColors
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -19,6 +22,7 @@ import java.util.Locale
 @Composable
 fun ReturnDatePickerDialog(
     initialDate: String? = null,
+    color: Color? = null,
     onDateSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -50,14 +54,17 @@ fun ReturnDatePickerDialog(
                     onDismiss()
                 }
             ) {
-                Text("OK")
+                Text("OK", color = AppColors.background)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена")
+                Text("Отмена", color = AppColors.background)
             }
-        }
+        },
+        colors = DatePickerDefaults.colors(
+            containerColor = color ?: AppColors.accentPrimary,
+        ),
     ) {
         DatePicker(state = datePickerState)
     }

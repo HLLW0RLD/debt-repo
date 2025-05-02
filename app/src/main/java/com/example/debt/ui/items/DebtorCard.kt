@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -46,7 +45,7 @@ import com.example.debt.data.model.TransactionType
 import com.example.debt.utils.AppColors
 import com.example.debt.utils.PreferenceCache
 import com.example.debt.utils.ThemeMode
-import com.example.debt.utils.generateColorScheme
+import com.example.debt.utils.cardColorById
 import com.example.debt.utils.openTelegramChat
 import com.example.debt.utils.setColorDate
 
@@ -58,15 +57,14 @@ fun DebtorCard(
     isMine: Boolean = false,
     debtor: Debtor,
     onPaymentClick: (Debtor) -> Unit,
-    onEditClick: (Debtor, Color?) -> Unit,
+    onEditClick: (Debtor) -> Unit,
     onDeleteDebtorClick: (Debtor) -> Unit
 ) {
 
     val scrollState = rememberLazyListState()
     var showHistory by remember { mutableStateOf(false) }
-    val isSystemInDarkTheme = isSystemInDarkTheme()
     val cardColor = remember(debtor.id) {
-        generateColorScheme(debtor.id, isSystemInDarkTheme)
+        cardColorById(debtor.id)
     }
 
     Card(
@@ -76,14 +74,7 @@ fun DebtorCard(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
-                        onEditClick(
-                            debtor,
-                            if (PreferenceCache.selectedTheme == ThemeMode.COLOR) {
-                                cardColor
-                            } else {
-                                null
-                            }
-                        )
+                        onEditClick(debtor)
                     },
                     onTap = { /* Обычный клик -- TODO  */ },
                     onDoubleTap = { /* Двойной клик -- TODO для открытия тг */ },

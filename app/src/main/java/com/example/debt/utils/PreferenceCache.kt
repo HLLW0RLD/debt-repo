@@ -5,12 +5,6 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateOf
 import com.example.debt.App
 import com.example.debt.app.utils.LogUtils.errorLog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
 
 object PreferenceCache {
     private val prefs: SharedPreferences = App.appInstance.getSharedPreferences(
@@ -36,4 +30,7 @@ object PreferenceCache {
             prefs.edit().putString(SELECTED_THEME, value.name).apply()
             themeChanged.value++
         }
+
+    val isColoredTheme get() = selectedTheme == ThemeMode.COLOR
+    val isDarkTheme get() = selectedTheme == ThemeMode.DARK
 }
