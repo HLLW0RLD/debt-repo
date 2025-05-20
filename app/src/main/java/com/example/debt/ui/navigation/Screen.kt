@@ -1,4 +1,4 @@
-package com.example.debt.ui.screens.navigation
+package com.example.debt.ui.navigation
 
 sealed class Screen(val route: String) {
     object Main : Screen("main")

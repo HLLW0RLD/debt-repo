@@ -17,41 +17,53 @@ class LocalRepositoryImpl(private val debtorDao: DebtorDao) : LocalRepository {
 
     override suspend fun insertDebtor(debtor: Debtor): Long {
         return try {
-            if (PreferenceCache.autoCountDebts) {
-                val mutualDebt = debtorDao.findDebt(
-                    name = debtor.name,
-                    telegramNick = debtor.telegramNick,
-                    isMine = !debtor.isMine
-                )
+            val existingDebt = debtorDao.findAnyDebt(
+                name = debtor.name,
+                telegramNick = debtor.telegramNick
+            )
 
-                mutualDebt?.let { existingDebt ->
-                    val amountToSettle = minOf(debtor.debtAmount, existingDebt.debtAmount)
+            var remainingAmount = debtor.debtAmount
 
-                    debtorDao.updateDebt(
-                        if (existingDebt.isMine)
-                            existingDebt.addDebt(amountToSettle)
-                        else
-                            existingDebt.addPayment(amountToSettle)
-                    )
-
-                    val remainingAmount = debtor.debtAmount - amountToSettle
-                    if (remainingAmount > 0) {
-                        val newDebtor = debtor.copy(debtAmount = remainingAmount)
-                        debtorDao.insert(newDebtor).also { id ->
-                            debugLog("Inserted debtor after settlement [id=$id]")
-                        }
-                    } else {
-                        debugLog("Debt fully settled with existing record")
+            if (PreferenceCache.autoCountDebts && existingDebt != null) {
+                when {
+                    existingDebt.isMine == debtor.isMine -> {
+                        val updatedDebt = existingDebt.addDebt(remainingAmount)
+                        debtorDao.updateDebt(updatedDebt)
+                        remainingAmount = 0.0
+                        debugLog("Merged same-type debt for ${debtor.name}")
                         existingDebt.id
                     }
-                } ?: run {
-                    debtorDao.insert(debtor).also { id ->
-                        debugLog("Inserted new debtor [id=$id]")
+
+                    existingDebt.isMine != debtor.isMine -> {
+                        val amountToSettle = minOf(remainingAmount, existingDebt.debtAmount)
+
+                        val updatedDebt = if (existingDebt.isMine) {
+                            existingDebt.addPayment(amountToSettle)
+                        } else {
+                            existingDebt.addDebt(amountToSettle)
+                        }
+
+                        if (updatedDebt.debtAmount == 0.0 && PreferenceCache.autoDeleteEmptyDebts) {
+                            debtorDao.deleteDebtor(updatedDebt.id)
+                            debugLog("Deleted zero-amount debt for ${debtor.name}")
+                        } else {
+                            debtorDao.updateDebt(updatedDebt)
+                        }
+
+                        remainingAmount -= amountToSettle
+                        debugLog("Settled $amountToSettle for debt [name=${debtor.name}]")
+                        existingDebt.id
+                    }
+
+                    else -> {
+                        debtorDao.insert(debtor).also { id ->
+                            debugLog("Inserted debtor with auto-settle on but no debt [name=${debtor.name}]")
+                        }
                     }
                 }
             } else {
                 debtorDao.insert(debtor).also { id ->
-                    debugLog("Inserted debtor with auto-settle off [id=$id]")
+                    debugLog("Inserted debtor [name=${debtor.name}] with auto-settle off")
                 }
             }
         } catch (e: Exception) {

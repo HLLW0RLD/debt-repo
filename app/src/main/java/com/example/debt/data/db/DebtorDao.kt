@@ -29,6 +29,17 @@ interface DebtorDao {
         isMine: Boolean
     ): Debtor?
 
+    @Query("""
+        SELECT * FROM debtors 
+        WHERE name = :name 
+        AND telegramNick = :telegramNick
+        LIMIT 1
+    """)
+    suspend fun findAnyDebt(
+        name: String,
+        telegramNick: String
+    ): Debtor?
+
     @Update
     suspend fun updateDebt(debtor: Debtor)
 
