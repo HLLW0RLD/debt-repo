@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.debt.app.ui.screens.MainUserScreen
-import com.example.debt.ui.screens.navigation.Screen
+import com.example.debt.ui.navigation.Screen
 import com.example.debt.ui.screens.settings.AppSettingsScreen
 import com.example.debt.ui.theme.AppTheme
 
