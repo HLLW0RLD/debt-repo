@@ -1,7 +1,11 @@
 package com.example.debt.utils
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import com.example.debt.App
 import java.text.SimpleDateFormat
@@ -9,6 +13,8 @@ import java.util.Date
 import java.util.Locale
 import androidx.core.net.toUri
 import com.example.debt.app.utils.LogUtils.errorLog
+import com.example.debt.ui.theme.DarkColorScheme
+import com.example.debt.ui.theme.DarkRandomColorScheme
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.ChronoUnit
@@ -85,4 +91,13 @@ fun String.setColorDate(): Color? {
         errorLog("string: $this \nerror $e")
     }
     return Color.Red
+}
+
+internal fun Context.findActivity(): ComponentActivity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is ComponentActivity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("Picture in picture should be called in the context of an Activity")
 }

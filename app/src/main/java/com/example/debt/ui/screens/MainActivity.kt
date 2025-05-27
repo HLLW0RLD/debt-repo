@@ -9,7 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.debt.app.ui.screens.MainUserScreen
-import com.example.debt.ui.navigation.Screen
+import com.example.debt.ui.navigation.Screen.AppSettings
+import com.example.debt.ui.navigation.Screen.Main
 import com.example.debt.ui.screens.settings.AppSettingsScreen
 import com.example.debt.ui.theme.AppTheme
 
@@ -24,14 +25,14 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.Main.route
+                    startDestination = Main.route
                 ) {
-                    composable(Screen.Main.route) {
+                    composable(Main.route) {
                         MainUserScreen(
-                            onSettingsClick = { navController.navigate(Screen.AppSettings.route) }
+                            onSettingsClick = { navController.navigate(AppSettings.route) }
                         )
                     }
-                    composable(Screen.AppSettings.route) {
+                    composable(AppSettings.route) {
                         AppSettingsScreen(
                             onBackClick = { navController.popBackStack() }
                         )

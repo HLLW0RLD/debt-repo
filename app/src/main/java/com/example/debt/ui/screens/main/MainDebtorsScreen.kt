@@ -82,15 +82,6 @@ fun MainUserScreen(
 
     var showThemeDialog by remember { mutableStateOf(false) }
 
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = Color.Black.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
-        }
-    }
-
     val filteredDebtors = remember(debtors, selectedTab) {
         when (selectedTab) {
             1 -> debtors.filter { !it.isMine }
@@ -100,6 +91,9 @@ fun MainUserScreen(
     }
 
     Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.background),
         contentAlignment = Alignment.Center
     ) {
         Column {

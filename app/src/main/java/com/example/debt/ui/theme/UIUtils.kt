@@ -1,14 +1,23 @@
 package com.example.debt.ui.theme
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.example.debt.utils.PreferenceCache
+import com.example.debt.utils.findActivity
 import kotlin.math.abs
 
 enum class ThemeMode {
@@ -22,6 +31,10 @@ fun AppTheme(
     content: @Composable () -> Unit
 ) {
 
+    val view = LocalView.current
+    val window = view.context.findActivity().window
+    val insetsController = WindowCompat.getInsetsController(window, view)
+
     val colorScheme = remember(PreferenceCache.themeChanged.value) {
         when (PreferenceCache.selectedTheme) {
             ThemeMode.COLOR -> if (isSystemDark) DarkRandomColorScheme else LightRandomColorScheme
@@ -29,6 +42,13 @@ fun AppTheme(
             ThemeMode.DARK -> DarkColorScheme
             ThemeMode.LIGHT -> LightColorScheme
         }
+    }
+
+    SideEffect {
+        window.statusBarColor = colorScheme.background.toArgb()
+        insetsController.isAppearanceLightStatusBars =
+            colorScheme != DarkColorScheme && colorScheme != DarkRandomColorScheme
+        window.navigationBarColor = colorScheme.background.toArgb()
     }
 
     MaterialTheme(
