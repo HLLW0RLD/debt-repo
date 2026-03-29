@@ -1,11 +1,9 @@
 package com.example.debt.app.ui.screens
 
-import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,11 +25,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -41,19 +37,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
 import com.example.debt.R
-import com.example.debt.data.model.Debtor
+import com.example.debt.data.model.Debt
 import com.example.debt.app.ui.items.DebtorCard
 import com.example.debt.app.ui.items.DebtorForm
 import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.SimpleDebtDialog
+import com.example.debt.ui.screens.main.DebtUiState
 import com.example.debt.ui.screens.main.MainDebtorViewModel
 import com.example.debt.ui.theme.AppColors
 import com.example.debt.utils.PreferenceCache
@@ -68,14 +62,14 @@ fun MainUserScreen(
 ) {
     val viewModel: MainDebtorViewModel = koinViewModel()
 
-    val debtors by viewModel.debtors.collectAsState(initial = emptyList())
+    val debtors by viewModel.debtors.collectAsState()
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var showPaymentDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var selectedDebtor by remember { mutableStateOf<Debtor?>(null) }
+    var selectedDebt by remember { mutableStateOf<Debt?>(null) }
 
-    var editedDebtor by remember { mutableStateOf<Debtor?>(null) }
+    var editedDebt by remember { mutableStateOf<Debt?>(null) }
 
     var isMineDebtsState by remember { mutableStateOf(false) }
 
@@ -172,35 +166,47 @@ fun MainUserScreen(
                 }
             }
 
-            LazyColumn(
-                modifier = Modifier
-                    .background(AppColors.background)
-                    .fillMaxSize()
-                    .padding(6.dp,),
-            ) {
-                item { Spacer(Modifier.size(12.dp)) }
-                items(filteredDebtors.size) { index ->
-                    DebtorCard(
-                        isMine = filteredDebtors[index].isMine,
-                        debtor = filteredDebtors[index],
-                        onDeleteDebtorClick = {
-                            selectedDebtor = it
-                            showDeleteDialog = true
-                        },
-                        onPaymentClick = { debtor ->
-                            editedDebtorBGcolor = if (PreferenceCache.isColoredTheme) interfaceColorById(debtor.id) else null
-                            selectedDebtor = debtor
-                            showPaymentDialog = true
-                        },
-                        onEditClick = { debtor ->
-                            editedDebtorBGcolor = if (PreferenceCache.isColoredTheme) interfaceColorById(debtor.id) else null
-                            editedDebtor = debtor
-                            isMineDebtsState = debtor.isMine
-                            showBottomSheet = true
+            when(val state = filteredDebtors) {
+                is DebtUiState.Success -> {
+                    val debtors = state.debtors
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .background(AppColors.background)
+                            .fillMaxSize()
+                            .padding(6.dp,),
+                    ) {
+                        item { Spacer(Modifier.size(12.dp)) }
+                        items(debtors.size) { index ->
+                            DebtorCard(
+                                isMine = debtors[index].isMine,
+                                debt = debtors[index],
+                                onDeleteDebtorClick = {
+                                    selectedDebt = it
+                                    showDeleteDialog = true
+                                },
+                                onPaymentClick = { debtor ->
+                                    editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
+                                        interfaceColorById(debtor.id)
+                                    else null
+                                    selectedDebt = debtor
+                                    showPaymentDialog = true
+                                },
+                                onEditClick = { debtor ->
+                                    editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
+                                        interfaceColorById(debtor.id)
+                                    else null
+                                    editedDebt = debtor
+                                    isMineDebtsState = debtor.isMine
+                                    showBottomSheet = true
+                                }
+                            )
                         }
-                    )
+                        item { Spacer(Modifier.size(52.dp)) }
+                    }
                 }
-                item { Spacer(Modifier.size(52.dp)) }
+                is DebtUiState.Loading -> {}
+                is DebtUiState.Error -> {}
             }
         }
 
@@ -212,7 +218,7 @@ fun MainUserScreen(
                 .background(shape = CircleShape, color = Color.White),
             onClick = {
                 isMineDebtsState = selectedTab == 2
-                editedDebtor = null
+                editedDebt = null
                 showBottomSheet = true
             }
         ) {
@@ -225,9 +231,9 @@ fun MainUserScreen(
         }
 
         if (showPaymentDialog) {
-            selectedDebtor?.let { debtor ->
+            selectedDebt?.let { debtor ->
                 PaymentDialog(
-                    debtor = debtor,
+                    debt = debtor,
                     color = editedDebtorBGcolor,
                     onDismiss = {
                         showPaymentDialog = false
@@ -251,7 +257,7 @@ fun MainUserScreen(
                 onDismiss = { showDeleteDialog = false },
                 onCancel = { showDeleteDialog = false },
                 onConfirm = {
-                    viewModel.deleteDebtor(selectedDebtor!!.id)
+                    viewModel.deleteDebtor(selectedDebt!!.id)
                     showDeleteDialog = false
                 }
             )
@@ -261,25 +267,40 @@ fun MainUserScreen(
             ModalBottomSheet(
                 onDismissRequest = {
                     showBottomSheet = false
-                    editedDebtor = null
+                    editedDebt = null
                     editedDebtorBGcolor = null
                 },
                 sheetState = rememberModalBottomSheetState(),
                 containerColor = AppColors.background,
             ) {
                DebtorForm(
-                   debtor = editedDebtor,
+                   debt = editedDebt,
                    isMine = isMineDebtsState,
                    color = editedDebtorBGcolor,
                    onSaveComplete = {
-                       if (editedDebtor != null) {
-                           viewModel.updateDebt(it)
+                       if (editedDebt != null) {
+                           viewModel.updateDebt(
+                               id = it.id,
+                               name = it.name,
+                               isMine = it.isMine,
+                               telegramNick = it.telegramNick,
+                               debtAmount = it.debtAmount,
+                               returnDate = it.returnDate,
+                               comment = it.comment,
+                           )
                            showBottomSheet = false
                        } else {
-                           viewModel.insertDebtor(it)
+                           viewModel.createDebt(
+                               name = it.name,
+                               isMine = it.isMine,
+                               telegramNick = it.telegramNick,
+                               debtAmount = it.debtAmount,
+                               returnDate = it.returnDate,
+                               comment = it.comment,
+                           )
                            showBottomSheet = false
                        }
-                       editedDebtor = null
+                       editedDebt = null
                    }
                )
             }

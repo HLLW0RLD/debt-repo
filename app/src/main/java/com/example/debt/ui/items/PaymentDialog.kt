@@ -21,14 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.debt.data.model.Debtor
+import com.example.debt.data.model.Debt
 import com.example.debt.ui.items.baseElements.DebtRadioButton
 import com.example.debt.ui.items.baseElements.DebtTextButton
 import com.example.debt.ui.theme.AppColors
 
 @Composable
 fun PaymentDialog(
-    debtor: Debtor,
+    debt: Debt,
     color: Color? = null,
     onDismiss: () -> Unit,
     onPayment: (Double, Boolean) -> Unit
@@ -42,8 +42,8 @@ fun PaymentDialog(
         title = { Text(text = "Операция с долгом") },
         text = {
             Column {
-                Text("Должник: ${debtor.name}")
-                Text("Текущий долг: ${debtor.debtAmount}")
+                Text("Должник: ${debt.name}")
+                Text("Текущий долг: ${debt.debtAmount}")
 
                 Spacer(Modifier.height(16.dp))
 

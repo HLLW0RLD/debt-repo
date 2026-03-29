@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.debt.data.model.Debtor
+import com.example.debt.data.model.Debt
 import com.example.debt.ui.items.baseElements.DatePickerField
 import com.example.debt.ui.items.baseElements.DebtOutlinedTextField
 import com.example.debt.ui.items.baseElements.DebtRadioButton
@@ -21,20 +21,20 @@ import com.example.debt.ui.theme.AppColors
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DebtorForm(
-    debtor: Debtor? = null,
+    debt: Debt? = null,
     isMine: Boolean = false,
     color: Color? = null,
-    onSaveComplete: (Debtor) -> Unit
+    onSaveComplete: (Debt) -> Unit
 ) {
 
-    val isEdit = debtor != null
+    val isEdit = debt != null
 
-    val name = remember { mutableStateOf(debtor?.name ?: "") }
-    val telegramNick = remember { mutableStateOf(debtor?.telegramNick ?: "") }
-    val debtAmount = remember { mutableStateOf(debtor?.debtAmount?.toString() ?: "") }
-    val returnDate = remember { mutableStateOf(debtor?.returnDate ?: "") }
-    val comment = remember { mutableStateOf(debtor?.comment ?: "") }
-    val isMineState = remember { mutableStateOf(debtor?.isMine ?: isMine) }
+    val name = remember { mutableStateOf(debt?.name ?: "") }
+    val telegramNick = remember { mutableStateOf(debt?.telegramNick ?: "") }
+    val debtAmount = remember { mutableStateOf(debt?.debtAmount?.toString() ?: "") }
+    val returnDate = remember { mutableStateOf(debt?.returnDate ?: "") }
+    val comment = remember { mutableStateOf(debt?.comment ?: "") }
+    val isMineState = remember { mutableStateOf(debt?.isMine ?: isMine) }
 
     Column(
         modifier = Modifier
@@ -117,19 +117,19 @@ fun DebtorForm(
             enabled = name.value.isNotBlank() && debtAmount.value.toDoubleOrNull() != null,
         ) {
             if (isEdit) {
-                val debtor = Debtor(
-                    id = debtor.id,
+                val debt = Debt(
+                    id = debt.id,
                     isMine = isMineState.value,
-                    telegramNick = if (telegramNick.value.isNotEmpty()) telegramNick.value else debtor.telegramNick,
-                    name = if (name.value.isNotEmpty()) name.value else debtor.name,
-                    debtAmount = debtor.debtAmount,
-                    returnDate = if (returnDate.value.isNotEmpty()) returnDate.value else debtor.returnDate,
-                    comment = if (comment.value.isNotEmpty()) comment.value else debtor.comment
+                    telegramNick = if (telegramNick.value.isNotEmpty()) telegramNick.value else debt.telegramNick,
+                    name = if (name.value.isNotEmpty()) name.value else debt.name,
+                    debtAmount = debt.debtAmount,
+                    returnDate = if (returnDate.value.isNotEmpty()) returnDate.value else debt.returnDate,
+                    comment = if (comment.value.isNotEmpty()) comment.value else debt.comment
                 )
-                onSaveComplete(debtor)
+                onSaveComplete(debt)
             } else {
                 val amount = debtAmount.value.toDoubleOrNull() ?: 0.0
-                val debtor = Debtor(
+                val debt = Debt(
                     telegramNick = telegramNick.value,
                     isMine = isMineState.value,
                     name = name.value,
@@ -137,7 +137,7 @@ fun DebtorForm(
                     returnDate = returnDate.value,
                     comment = comment.value
                 )
-                onSaveComplete(debtor)
+                onSaveComplete(debt)
             }
         }
     }

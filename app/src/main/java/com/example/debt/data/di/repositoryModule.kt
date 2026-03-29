@@ -1,15 +1,14 @@
 package com.example.debt.app.data.di
 
-import com.example.debt.data.db.AppDatabase
-import com.example.debt.app.data.repo.LocalRepository
-import com.example.debt.app.data.repo.LocalRepositoryImpl
+import com.example.debt.app.data.repo.DebtRepository
+import com.example.debt.app.data.repo.DebtRepositoryImpl
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single<LocalRepository> {
+    single<DebtRepository> {
         val db = get<AppDatabase>()
 
-        LocalRepositoryImpl(
+        DebtRepositoryImpl(
             debtorDao = db.debtorDao()
         )
     }

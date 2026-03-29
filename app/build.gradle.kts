@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlin-kapt")
 }
 
@@ -52,22 +53,45 @@ android {
 
     dependencies {
 
-        // Koin
-        implementation(libs.koin.android)
-        implementation(libs.koin.compose)
-        implementation(libs.koin.core)
+        // coil
+        implementation(libs.coil.compose)
 
-        // Gson
+        // datastore
+        implementation(libs.androidx.datastore.preferences)
+        implementation(libs.androidx.datastore)
+
+        // api
+        implementation(libs.retrofit)
+        implementation(libs.logging.interceptor)
+
+        // gson
         implementation(libs.gson)
-        implementation(libs.gson.parent)
-        implementation(libs.threetenabp)
+        implementation(libs.converter.gson)
 
-        // Room
-        val room_version = "2.6.1"
-        implementation("androidx.room:room-runtime:$room_version")
-        implementation("androidx.room:room-ktx:$room_version")
-        annotationProcessor("androidx.room:room-compiler:$room_version")
-        kapt("androidx.room:room-compiler:$room_version")
+        // navigation
+        implementation(libs.androidx.navigation.compose)
+
+        // reflect
+        implementation(libs.kotlin.reflect)
+
+
+        // room
+        implementation(libs.androidx.room.runtime)
+        implementation(libs.androidx.room.ktx)
+        implementation(libs.retrofit2.kotlin.coroutines.adapter)
+        kapt(libs.androidx.room.compiler)
+
+        // security
+        implementation(libs.androidx.security.crypto)
+
+        // paging
+        implementation(libs.androidx.paging.runtime)
+        implementation(libs.androidx.paging.compose)
+
+        // koin
+        implementation(libs.koin.core)
+        implementation(libs.koin.android)
+        implementation(libs.koin.androidx.compose)
 
         implementation(libs.androidx.navigation.compose)
         implementation(libs.androidx.core.ktx)

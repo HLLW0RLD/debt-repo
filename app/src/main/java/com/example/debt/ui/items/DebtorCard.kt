@@ -40,7 +40,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.debt.R
-import com.example.debt.data.model.Debtor
+import com.example.debt.data.model.Debt
 import com.example.debt.data.model.TransactionType
 import com.example.debt.ui.theme.AppColors
 import com.example.debt.utils.PreferenceCache
@@ -55,16 +55,16 @@ const val MINUS = "-"
 @Composable
 fun DebtorCard(
     isMine: Boolean = false,
-    debtor: Debtor,
-    onPaymentClick: (Debtor) -> Unit,
-    onEditClick: (Debtor) -> Unit,
-    onDeleteDebtorClick: (Debtor) -> Unit
+    debt: Debt,
+    onPaymentClick: (Debt) -> Unit,
+    onEditClick: (Debt) -> Unit,
+    onDeleteDebtorClick: (Debt) -> Unit
 ) {
 
     val scrollState = rememberLazyListState()
     var showHistory by remember { mutableStateOf(false) }
-    val cardColor = remember(debtor.id) {
-        cardColorById(debtor.id)
+    val cardColor = remember(debt.id) {
+        cardColorById(debt.id)
     }
 
     Card(
@@ -74,7 +74,7 @@ fun DebtorCard(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
-                        onEditClick(debtor)
+                        onEditClick(debt)
                     },
                     onTap = { /* Обычный клик -- TODO  */ },
                     onDoubleTap = { /* Двойной клик -- TODO для открытия тг */ },
@@ -118,7 +118,7 @@ fun DebtorCard(
                     )
                     Spacer(Modifier.size(4.dp))
                     Text(
-                        text = debtor.name,
+                        text = debt.name,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = AppColors.textPrimary
@@ -131,7 +131,7 @@ fun DebtorCard(
                     modifier = Modifier
                         .size(32.dp)
                         .padding(4.dp)
-                        .clickable { onDeleteDebtorClick(debtor) }
+                        .clickable { onDeleteDebtorClick(debt) }
                 )
             }
 
@@ -143,7 +143,7 @@ fun DebtorCard(
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    text = "Долг: ${debtor.debtAmount} ₽",
+                    text = "Долг: ${debt.debtAmount} ₽",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = AppColors.textPrimary
@@ -168,8 +168,8 @@ fun DebtorCard(
                         .heightIn(max = 320.dp)
                         .padding(8.dp),
                 ) {
-                    items(debtor.transactions.size) { transactionInd ->
-                        val transaction = debtor.transactions[debtor.transactions.size - 1 - transactionInd]
+                    items(debt.transactions.size) { transactionInd ->
+                        val transaction = debt.transactions[debt.transactions.size - 1 - transactionInd]
                         val operator = if (transaction.type == TransactionType.PAYMENT) PLUS else MINUS
                         val color = if (transaction.type == TransactionType.PAYMENT) AppColors.success else AppColors.error
                         var trueOperator = ""
@@ -207,23 +207,23 @@ fun DebtorCard(
         ) {
 
             Text(
-                text = "Дата займа: ${debtor.loanDate}",
+                text = "Дата займа: ${debt.loanDate}",
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            if (debtor.returnDate.setColorDate() != null) {
+            if (debt.returnDate.setColorDate() != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Дата возврата: ${debtor.returnDate}",
+                    text = "Дата возврата: ${debt.returnDate}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = debtor.returnDate.setColorDate() ?: Color.White
+                    color = debt.returnDate.setColorDate() ?: Color.White
                 )
             }
 
-            if (debtor.comment.isNotEmpty()) {
+            if (debt.comment.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Комментарий: ${debtor.comment}",
+                    text = "Комментарий: ${debt.comment}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontStyle = FontStyle.Italic
                 )
@@ -245,10 +245,10 @@ fun DebtorCard(
                             shape = RoundedCornerShape(20.dp),
                             color = AppColors.background
                         )
-                        .clickable { onPaymentClick(debtor) }
+                        .clickable { onPaymentClick(debt) }
                 )
 
-                if (debtor.telegramNick.isNotBlank()) {
+                if (debt.telegramNick.isNotBlank()) {
                     Image(
                         contentDescription = "",
                         painter = painterResource(R.drawable.ic_telegram),
@@ -258,7 +258,7 @@ fun DebtorCard(
                                 shape = RoundedCornerShape(20.dp),
                                 color = Color.White
                             )
-                            .clickable { debtor.telegramNick.openTelegramChat() }
+                            .clickable { debt.telegramNick.openTelegramChat() }
                     )
                 }
             }
