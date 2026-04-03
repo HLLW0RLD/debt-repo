@@ -5,7 +5,6 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import com.example.debt.App
 import java.text.SimpleDateFormat
@@ -13,11 +12,9 @@ import java.util.Date
 import java.util.Locale
 import androidx.core.net.toUri
 import com.example.debt.app.utils.LogUtils.errorLog
-import com.example.debt.ui.theme.DarkColorScheme
-import com.example.debt.ui.theme.DarkRandomColorScheme
-import org.threeten.bp.LocalDate
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.temporal.ChronoUnit
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 val LENGTH_LONG = Toast.LENGTH_LONG
 val LENGTH_SHORT = Toast.LENGTH_SHORT
