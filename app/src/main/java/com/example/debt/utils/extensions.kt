@@ -3,8 +3,10 @@ package com.example.debt.utils
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import com.example.debt.App
 import java.text.SimpleDateFormat
@@ -27,22 +29,11 @@ fun Any.toast(msg: Any?, duration: Int = LENGTH_SHORT) {
         .show()
 }
 
-fun getCurrentDate(): String {
-    val dateFormat = SimpleDateFormat("yyyy_MM_dd", Locale.getDefault())
-    val date = Date()
-    return dateFormat.format(date)
-}
-
 fun getCurrentDateTime(): String {
     val dateFormat = SimpleDateFormat("HH:mm:ss dd.MM.yyyy")
     val date = Date()
     return dateFormat
         .format(date)
-}
-
-fun String.capitalizeFirstLetter(): String {
-    if (this.isEmpty()) return this
-    return this.substring(0, 1).uppercase() + this.substring(1)
 }
 
 fun String.openTelegramChat() {
@@ -63,6 +54,7 @@ fun String.openTelegramChat() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun String.setColorDate(): Color? {
     try {
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")

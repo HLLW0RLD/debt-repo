@@ -1,5 +1,7 @@
 package com.example.debt.app.ui.items
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -52,6 +54,7 @@ import com.example.debt.utils.setColorDate
 const val PLUS = "+"
 const val MINUS = "-"
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DebtorCard(
     isMine: Boolean = false,
@@ -184,7 +187,7 @@ fun DebtorCard(
                         }
 
                         Text(
-                            text = "${transaction.type.v.uppercase()} - ${transaction.date}",
+                            text = "${transaction.type.name.uppercase()} - ${transaction.date}",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = AppColors.textPrimary
@@ -211,7 +214,7 @@ fun DebtorCard(
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            if (debt.returnDate.setColorDate() != null) {
+            if (debt.returnDate?.setColorDate() != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Дата возврата: ${debt.returnDate}",
@@ -220,7 +223,7 @@ fun DebtorCard(
                 )
             }
 
-            if (debt.comment.isNotEmpty()) {
+            if (!debt.comment.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Комментарий: ${debt.comment}",
@@ -248,7 +251,7 @@ fun DebtorCard(
                         .clickable { onPaymentClick(debt) }
                 )
 
-                if (debt.telegramNick.isNotBlank()) {
+                if (!debt.telegramNick.isNullOrEmpty()) {
                     Image(
                         contentDescription = "",
                         painter = painterResource(R.drawable.ic_telegram),

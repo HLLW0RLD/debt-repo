@@ -2,6 +2,7 @@ package com.example.debt.app.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,16 +19,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -37,8 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.debt.R
@@ -46,7 +52,7 @@ import com.example.debt.data.model.Debt
 import com.example.debt.app.ui.items.DebtorCard
 import com.example.debt.app.ui.items.DebtorForm
 import com.example.debt.ui.items.PaymentDialog
-import com.example.debt.ui.items.SimpleDebtDialog
+import com.example.debt.ui.items.DebtDialog
 import com.example.debt.ui.screens.main.DebtUiState
 import com.example.debt.ui.screens.main.MainDebtorViewModel
 import com.example.debt.ui.theme.AppColors
@@ -60,9 +66,9 @@ import org.koin.androidx.compose.koinViewModel
 fun MainUserScreen(
     onSettingsClick: () -> Unit
 ) {
-    val viewModel: MainDebtorViewModel = koinViewModel()
+    val mainDebtorViewModel: MainDebtorViewModel = koinViewModel()
 
-    val debtors by viewModel.debtors.collectAsState()
+    val debtors by mainDebtorViewModel.debtors.collectAsState()
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var showPaymentDialog by remember { mutableStateOf(false) }
@@ -80,12 +86,8 @@ fun MainUserScreen(
 
     var showThemeDialog by remember { mutableStateOf(false) }
 
-    val filteredDebtors = remember(debtors, selectedTab) {
-        when (selectedTab) {
-            1 -> debtors.filter { !it.isMine }
-            2 -> debtors.filter { it.isMine }
-            else -> debtors
-        }
+    LaunchedEffect(Unit) {
+        mainDebtorViewModel.loadAllDebts()
     }
 
     Box(
@@ -94,7 +96,12 @@ fun MainUserScreen(
             .background(AppColors.background),
         contentAlignment = Alignment.Center
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxSize()
+                .background(AppColors.background),
+        ) {
             Spacer(Modifier.size(50.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -118,101 +125,202 @@ fun MainUserScreen(
                     )
                 }
             }
-            Divider(Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(Color.Black)
+
+            Divider(
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(Color.Black)
             )
 
-            TabRow(
-                modifier = Modifier.padding(8.dp),
-                selectedTabIndex = selectedTab,
-                indicator = { },
-                divider = { },
-                containerColor = AppColors.background,
-            ) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        modifier = Modifier
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = {}
-                            )
-                            .background(
-                                shape = RoundedCornerShape(20.dp),
-                                color = if (selectedTab == index) {
-                                    AppColors.textPrimary
-                                } else {
-                                    AppColors.background
-                                }
-                            ),
-                        selected = selectedTab == index,
-                        onClick = {
-                            selectedTab = index
-                            isMineDebtsState = index == 2
-                        },
-                        text = {
-                            Text(
-                                text = title,
-                                color = if (selectedTab == index) {
-                                    AppColors.background
-                                } else {
-                                    AppColors.textPrimary
-                                },
-                            )
-                        },
-                    )
-                }
-            }
+            when (val state = debtors) {
 
-            when(val state = filteredDebtors) {
                 is DebtUiState.Success -> {
-                    val debtors = state.debtors
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .background(AppColors.background)
-                            .fillMaxSize()
-                            .padding(6.dp,),
+                    TabRow(
+                        modifier = Modifier.padding(8.dp),
+                        selectedTabIndex = selectedTab,
+                        indicator = { },
+                        divider = { },
+                        containerColor = AppColors.background,
                     ) {
-                        item { Spacer(Modifier.size(12.dp)) }
-                        items(debtors.size) { index ->
-                            DebtorCard(
-                                isMine = debtors[index].isMine,
-                                debt = debtors[index],
-                                onDeleteDebtorClick = {
-                                    selectedDebt = it
-                                    showDeleteDialog = true
+                        tabs.forEachIndexed { index, title ->
+                            Tab(
+                                modifier = Modifier
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null,
+                                        onClick = {}
+                                    )
+                                    .background(
+                                        shape = RoundedCornerShape(20.dp),
+                                        color = if (selectedTab == index) {
+                                            AppColors.textPrimary
+                                        } else {
+                                            AppColors.background
+                                        }
+                                    ),
+                                selected = selectedTab == index,
+                                onClick = {
+                                    selectedTab = index
+                                    isMineDebtsState = index == 2
                                 },
-                                onPaymentClick = { debtor ->
-                                    editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
-                                        interfaceColorById(debtor.id)
-                                    else null
-                                    selectedDebt = debtor
-                                    showPaymentDialog = true
+                                text = {
+                                    Text(
+                                        text = title,
+                                        color = if (selectedTab == index) {
+                                            AppColors.background
+                                        } else {
+                                            AppColors.textPrimary
+                                        },
+                                    )
                                 },
-                                onEditClick = { debtor ->
-                                    editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
-                                        interfaceColorById(debtor.id)
-                                    else null
-                                    editedDebt = debtor
-                                    isMineDebtsState = debtor.isMine
-                                    showBottomSheet = true
-                                }
                             )
                         }
-                        item { Spacer(Modifier.size(52.dp)) }
+                    }
+
+                    val data = state.debtors
+
+                    if (data.isEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = null
+                                ) {
+                                    showBottomSheet = true
+                                },
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .size(250.dp),
+                                painter = painterResource(R.drawable.ic_money),
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(AppColors.accentPrimary)
+                            )
+                            Text(
+                                color = AppColors.textPrimary,
+                                text = "Еще нет записей о долгах, создать?",
+                                fontSize = 24.sp,
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                            )
+                        }
+                    } else {
+                        val filteredDebtors = remember(data, selectedTab) {
+                            when (selectedTab) {
+                                1 -> data.filter { !it.isMine }
+                                2 -> data.filter { it.isMine }
+                                else -> data
+                            }
+                        }
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .background(AppColors.background)
+                                .fillMaxSize()
+                                .padding(6.dp),
+                        ) {
+                            item { Spacer(Modifier.size(12.dp)) }
+
+                            items(filteredDebtors.size) { index ->
+                                DebtorCard(
+                                    isMine = data[index].isMine,
+                                    debt = data[index],
+                                    onDeleteDebtorClick = {
+                                        selectedDebt = it
+                                        showDeleteDialog = true
+                                    },
+                                    onPaymentClick = { debtor ->
+                                        editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
+                                            interfaceColorById(debtor.id)
+                                        else null
+                                        selectedDebt = debtor
+                                        showPaymentDialog = true
+                                    },
+                                    onEditClick = { debtor ->
+                                        editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
+                                            interfaceColorById(debtor.id)
+                                        else null
+                                        editedDebt = debtor
+                                        isMineDebtsState = debtor.isMine
+                                        showBottomSheet = true
+                                    }
+                                )
+                            }
+                            item { Spacer(Modifier.size(52.dp)) }
+                        }
                     }
                 }
-                is DebtUiState.Loading -> {}
-                is DebtUiState.Error -> {}
+
+                is DebtUiState.Loading -> {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+
+                        Text(
+                            color = AppColors.textPrimary,
+                            text = "Загрузка долгов...",
+                            fontSize = 24.sp,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                        )
+                    }
+                }
+
+                is DebtUiState.Error -> {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable(
+                                indication = null,
+                                interactionSource = null
+                            ) {
+                                mainDebtorViewModel.loadAllDebts()
+                            },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            modifier = Modifier
+                                .size(250.dp),
+                            painter = painterResource(R.drawable.ic_money),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(AppColors.accentPrimary)
+                        )
+                        Text(
+                            color = AppColors.textPrimary,
+                            text = "Ошибка загрузки, повторить?",
+                            fontSize = 24.sp,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                        )
+                    }
+                }
             }
         }
 
         IconButton(
             modifier = Modifier
-                .padding(12.dp)
+                .padding(36.dp)
                 .size(56.dp)
                 .align(Alignment.BottomEnd)
                 .background(shape = CircleShape, color = Color.White),
@@ -238,13 +346,13 @@ fun MainUserScreen(
                     onDismiss = {
                         showPaymentDialog = false
                         editedDebtorBGcolor = null
-                                },
+                    },
                     onPayment = { amount, isDebt ->
                         debtor.let { debtor ->
                             if (isDebt) {
-                                viewModel.addDebt(debtor.id, amount)
+                                mainDebtorViewModel.addDebt(debtor.id, amount)
                             } else {
-                                viewModel.payDebt(debtor.id, amount)
+                                mainDebtorViewModel.payDebt(debtor.id, amount)
                             }
                         }
                     }
@@ -253,11 +361,11 @@ fun MainUserScreen(
         }
 
         if (showDeleteDialog) {
-            SimpleDebtDialog(
+            DebtDialog(
                 onDismiss = { showDeleteDialog = false },
                 onCancel = { showDeleteDialog = false },
                 onConfirm = {
-                    viewModel.deleteDebtor(selectedDebt!!.id)
+                    mainDebtorViewModel.deleteDebtor(selectedDebt!!.id)
                     showDeleteDialog = false
                 }
             )
@@ -273,36 +381,36 @@ fun MainUserScreen(
                 sheetState = rememberModalBottomSheetState(),
                 containerColor = AppColors.background,
             ) {
-               DebtorForm(
-                   debt = editedDebt,
-                   isMine = isMineDebtsState,
-                   color = editedDebtorBGcolor,
-                   onSaveComplete = {
-                       if (editedDebt != null) {
-                           viewModel.updateDebt(
-                               id = it.id,
-                               name = it.name,
-                               isMine = it.isMine,
-                               telegramNick = it.telegramNick,
-                               debtAmount = it.debtAmount,
-                               returnDate = it.returnDate,
-                               comment = it.comment,
-                           )
-                           showBottomSheet = false
-                       } else {
-                           viewModel.createDebt(
-                               name = it.name,
-                               isMine = it.isMine,
-                               telegramNick = it.telegramNick,
-                               debtAmount = it.debtAmount,
-                               returnDate = it.returnDate,
-                               comment = it.comment,
-                           )
-                           showBottomSheet = false
-                       }
-                       editedDebt = null
-                   }
-               )
+                DebtorForm(
+                    debt = editedDebt,
+                    isMine = isMineDebtsState,
+                    color = editedDebtorBGcolor,
+                    onSaveComplete = {
+                        if (editedDebt != null) {
+                            mainDebtorViewModel.updateDebt(
+                                id = it.id,
+                                name = it.name,
+                                isMine = it.isMine,
+                                telegramNick = it.telegramNick,
+                                debtAmount = it.debtAmount,
+                                returnDate = it.returnDate,
+                                comment = it.comment,
+                            )
+                            showBottomSheet = false
+                        } else {
+                            mainDebtorViewModel.createDebt(
+                                name = it.name,
+                                isMine = it.isMine,
+                                telegramNick = it.telegramNick,
+                                debtAmount = it.debtAmount,
+                                returnDate = it.returnDate,
+                                comment = it.comment,
+                            )
+                            showBottomSheet = false
+                        }
+                        editedDebt = null
+                    }
+                )
             }
         }
     }

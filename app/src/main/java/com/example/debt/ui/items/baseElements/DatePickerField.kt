@@ -5,8 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,6 +14,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import com.example.debt.R
 import com.example.debt.ui.theme.AppColors
 import com.example.debt.utils.getCurrentDateTime
 
@@ -39,7 +39,8 @@ fun DatePickerField(
             label = label,
             trailingIcon = {
                 Icon(
-                    Icons.Default.DateRange, contentDescription = "Выбрать дату",
+                    painter = painterResource(R.drawable.clock),
+                    contentDescription = "Выбрать дату",
                     tint = color ?: AppColors.accentPrimary
                 )
             },

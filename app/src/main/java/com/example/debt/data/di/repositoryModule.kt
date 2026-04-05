@@ -5,11 +5,8 @@ import com.example.debt.app.data.repo.DebtRepositoryImpl
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single<DebtRepository> {
-        val db = get<AppDatabase>()
 
-        DebtRepositoryImpl(
-            debtorDao = db.debtorDao()
-        )
+    single<DebtRepository> {
+        DebtRepositoryImpl(get())
     }
 }

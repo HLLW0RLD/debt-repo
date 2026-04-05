@@ -20,7 +20,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 @Composable
-fun SimpleDebtDialog(
+fun DebtDialog(
     title: String? = null,
     confirmTitle: String? = null,
     dismissTitle: String? = null,

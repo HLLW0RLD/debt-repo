@@ -5,28 +5,14 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 
 object LogUtils {
-    const val TEST_LOG = "TEST_LOG"
-
-    fun <T> T.wtf(message: String? = null): T {
-        Log.wtf("WTF", message ?: this.toString())
-        return this
-    }
+    const val TEST_LOG = "TESTOVIY"
 
     fun Any.debugLog(msg: Any?, tag: String? = null) {
         Log.d(
-            tag ?: setTag(),
+            tag ?: TEST_LOG,
             "$START_LOG DEBUG ${getClassWithMethod()} \n\t $RESULT_LOG ${
                 createMsg(msg)
             } \n$END_LOG DEBUG ${getClassWithMethod()}\n$BORDER"
-        )
-    }
-
-    fun Any.testLog(msg: Any?, tag: String? = null) {
-        Log.i(
-            tag ?: TEST_LOG,
-            "$START_LOG TEST ${getClassWithMethod()} \n\t TEST $RESULT_LOG: ${
-                createMsg(msg)
-            } \n$END_LOG TEST ${getClassWithMethod()}\n$BORDER"
         )
     }
 

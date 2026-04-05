@@ -3,6 +3,7 @@ package com.example.debt.ui.screens.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.debt.app.data.repo.DebtRepository
+import com.example.debt.app.utils.LogUtils.errorLog
 import com.example.debt.data.model.Debt
 import com.example.debt.data.model.Transaction
 import com.example.debt.data.model.TransactionType
@@ -22,7 +23,9 @@ sealed class DebtUiState {
     data class Error(val message: String) : DebtUiState()
 }
 
-class MainDebtorViewModel(private val repository: DebtRepository) : ViewModel() {
+class MainDebtorViewModel(
+    private val repository: DebtRepository
+) : ViewModel() {
 
     private val _debtors = MutableStateFlow<DebtUiState>(DebtUiState.Loading)
     val debtors = _debtors.asStateFlow()
@@ -33,8 +36,14 @@ class MainDebtorViewModel(private val repository: DebtRepository) : ViewModel() 
     fun loadAllDebts() {
         viewModelScope.launch {
             _debtors.value = DebtUiState.Loading
-            repository.getAllDebts().collect { debts ->
-                _debtors.value = DebtUiState.Success(debts)
+
+            try {
+                repository.getAllDebts().collect { debts ->
+                    _debtors.value = DebtUiState.Success(debts)
+                }
+            } catch (e: Exception) {
+                _debtors.value = DebtUiState.Error(e.message ?: "loadAllDebts error")
+                errorLog(e.message ?: "loadAllDebts error")
             }
         }
     }
@@ -66,24 +75,38 @@ class MainDebtorViewModel(private val repository: DebtRepository) : ViewModel() 
                 )
             )
 
-            repository.createDebt(request)
-            loadAllDebts()
+            try {
+                repository.createDebt(request)
+                loadAllDebts()
+            } catch (e: Exception) {
+                _debtors.value = DebtUiState.Error(e.message ?: "createDebt Error")
+            }
         }
     }
 
     fun payDebt(debtorId: String, paymentAmount: Double) {
         viewModelScope.launch {
             _debtors.value = DebtUiState.Loading
-            repository.payDebt(debtorId, paymentAmount)
-            loadAllDebts()
+
+            try {
+                repository.payDebt(debtorId, paymentAmount)
+                loadAllDebts()
+            } catch (e: Exception) {
+                _debtors.value = DebtUiState.Error(e.message ?: "payDebt Error")
+            }
         }
     }
 
     fun addDebt(debtorId: String, additionalAmount: Double) {
         viewModelScope.launch {
             _debtors.value = DebtUiState.Loading
-            repository.addDebt(debtorId, additionalAmount)
-            loadAllDebts()
+
+            try {
+                repository.addDebt(debtorId, additionalAmount)
+                loadAllDebts()
+            } catch (e: Exception) {
+                _debtors.value = DebtUiState.Error(e.message ?: "addDebt Error")
+            }
         }
     }
 
@@ -108,22 +131,35 @@ class MainDebtorViewModel(private val repository: DebtRepository) : ViewModel() 
                 comment = comment
             )
 
-            repository.updateDebt(id, request)
-            loadAllDebts()
+            try {
+                repository.updateDebt(id, request)
+                loadAllDebts()
+            } catch (e: Exception) {
+                _debtors.value = DebtUiState.Error(e.message ?: "updateDebt Error")
+            }
         }
     }
 
     fun deleteDebtor(id: String) {
         viewModelScope.launch {
             _debtors.value = DebtUiState.Loading
-            repository.deleteDebt(id)
-            loadAllDebts()
+
+            try {
+                repository.deleteDebt(id)
+                loadAllDebts()
+            } catch (e: Exception) {
+                _debtors.value = DebtUiState.Error(e.message ?: "deleteDebtor Error")
+            }
         }
     }
 
-    suspend fun getDebtorById(id: String) {
+    fun getDebtorById(id: String) {
         viewModelScope.launch {
-            _debtor.value = repository.getDebtById(id)
+            try {
+                _debtor.value = repository.getDebtById(id)
+            } catch (e: Exception) {
+                _debtors.value = DebtUiState.Error(e.message ?: "getDebtorById Error")
+            }
         }
     }
 }

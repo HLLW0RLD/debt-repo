@@ -57,16 +57,18 @@ fun AppTheme(
     )
 }
 
-fun cardColorById(id: Long): Color {
+fun cardColorById(id: String): Color {
+    val index = (id.hashCode() and Int.MAX_VALUE) % darkBGColors.size
     return if (PreferenceCache.isDarkTheme) {
-        darkBGColors[abs(id.hashCode()) % darkBGColors.size]
+        darkBGColors[index]
     } else {
-        lightBGColors[abs(id.hashCode()) % lightBGColors.size]
+        lightBGColors[index]
     }
 }
 
-fun interfaceColorById(id: Long): Color {
-    return darkBGColors[abs(id.hashCode()) % darkBGColors.size]
+fun interfaceColorById(id: String): Color {
+    val index = (id.hashCode() and Int.MAX_VALUE) % darkBGColors.size
+    return darkBGColors[index]
 }
 
 val lightBGColors = listOf(
