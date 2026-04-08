@@ -11,11 +11,11 @@ import com.example.debt.data.model.request.DebtRequest
 import com.example.debt.data.model.request.DebtUpdateRequest
 import com.example.debt.data.model.request.TransactionRequest
 import com.example.debt.utils.getCurrentDateTime
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
+import kotlin.random.Random
 
 sealed class DebtUiState {
     object Loading : DebtUiState()
@@ -33,14 +33,45 @@ class MainDebtorViewModel(
     private val _debtor = MutableStateFlow<Debt?>(null)
     val debtor = _debtor.asStateFlow()
 
+    init {
+        loadAllDebts()
+    }
+
     fun loadAllDebts() {
         viewModelScope.launch {
             _debtors.value = DebtUiState.Loading
+            delay(1500)
 
             try {
-                repository.getAllDebts().collect { debts ->
-                    _debtors.value = DebtUiState.Success(debts)
+//                repository.getAllDebts().collect { debts ->
+//                    _debtors.value = DebtUiState.Success(debts)
+//                }
+
+                val emptList = listOf<Debt>()
+                val list = List(12) {
+                    Debt(
+                        id = "id_${it}_${Random.nextInt(1000, 9999)}",
+                        name = listOf("Алексей", "Мария", "Иван", "Елена", "Дмитрий", "Анна", "Сергей", "Ольга", "Павел", "Татьяна").random(),
+                        isMine = Random.nextBoolean(),
+                        telegramNick = null,
+                        debtAmount = 10000.0,
+                        comment = listOf("За обед", "За билеты", "За подарок", "Долг", "Возврат", "").random(),
+                        transactions = listOf()
+//                        transactions = List(Random.nextInt(1, 5)) { index ->
+//                            Transaction(
+//                                id = "trans_${it}_${index}_${Random.nextInt(1000)}",
+//                                amount = Random.nextDouble(50.0, 1000.0).let { String.format("%.2f", it).toDouble() },
+//                                date = "2024-${Random.nextInt(1, 13)}-${Random.nextInt(1, 29)}",
+//                                type = if (Random.nextBoolean()) TransactionType.PAYMENT else TransactionType.DEBT,
+//                                comment = listOf("Частичный возврат", "Полный расчёт", "Аванс", "").random()
+//                            )
+//                        }
+                    )
                 }
+
+                _debtors.value = DebtUiState.Success(list)
+//                _debtors.value = DebtUiState.Success(emptList)
+
             } catch (e: Exception) {
                 _debtors.value = DebtUiState.Error(e.message ?: "loadAllDebts error")
                 errorLog(e.message ?: "loadAllDebts error")

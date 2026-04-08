@@ -2,6 +2,7 @@ package com.example.debt.app.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,23 +36,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.debt.R
 import com.example.debt.data.model.Debt
 import com.example.debt.app.ui.items.DebtorCard
 import com.example.debt.app.ui.items.DebtorForm
+import com.example.debt.app.utils.LogUtils.debugLog
 import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.DebtDialog
 import com.example.debt.ui.screens.main.DebtUiState
@@ -81,17 +91,56 @@ fun MainUserScreen(
 
     var editedDebtorBGcolor by remember { mutableStateOf<Color?>(null) }
 
-    val tabs = listOf("все", "мне должны", "я должен")
+    val tabs = listOf(
+        stringResource(R.string.tab_all),
+        stringResource(R.string.tab_owe_me),
+        stringResource(R.string.tab_i_owe)
+    )
     var selectedTab by remember { mutableIntStateOf(0) }
 
     var showThemeDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        mainDebtorViewModel.loadAllDebts()
+    val scrollThreshold = 24f
+    var accumulatedScroll by remember { mutableFloatStateOf(0f) }
+
+    var extended by remember { mutableStateOf(true) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (source != NestedScrollSource.Drag) return Offset.Zero
+                accumulatedScroll += available.y
+
+                when {
+                    accumulatedScroll > scrollThreshold &&
+                            !extended -> {
+                        extended = true
+                        accumulatedScroll = 0f
+                    }
+
+                    accumulatedScroll < -scrollThreshold &&
+                            extended -> {
+                        extended = false
+                        accumulatedScroll = 0f
+                    }
+                }
+
+                return Offset.Zero
+            }
+
+            override suspend fun onPostFling(
+                consumed: Velocity,
+                available: Velocity
+            ): Velocity {
+                accumulatedScroll = 0f
+                return Velocity.Zero
+            }
+        }
     }
 
     Box(
         modifier = Modifier
+            .nestedScroll(nestedScrollConnection)
             .fillMaxSize()
             .background(AppColors.background),
         contentAlignment = Alignment.Center
@@ -105,21 +154,21 @@ fun MainUserScreen(
             Spacer(Modifier.size(50.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .background(AppColors.background)
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp),
             ) {
                 Text(
-                    text = "debt",
-                    fontSize = 48.sp,
+                    text = stringResource(R.string.debt_title),
+                    fontSize = 24.sp,
                     color = AppColors.textPrimary,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { showThemeDialog = true }
                 )
                 IconButton(onClick = onSettingsClick) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_shelves_horizontal),
+                        painter = painterResource(R.drawable.gear),
                         tint = AppColors.textPrimary,
                         contentDescription = "",
                     )
@@ -129,53 +178,57 @@ fun MainUserScreen(
             Divider(
                 Modifier
                     .fillMaxWidth()
-                    .height(2.dp)
-                    .background(Color.Black)
+                    .height(1.dp)
+                    .background(AppColors.textPrimary)
             )
 
             when (val state = debtors) {
 
                 is DebtUiState.Success -> {
 
-                    TabRow(
-                        modifier = Modifier.padding(8.dp),
-                        selectedTabIndex = selectedTab,
-                        indicator = { },
-                        divider = { },
-                        containerColor = AppColors.background,
+                    AnimatedVisibility(
+                        visible = extended,
                     ) {
-                        tabs.forEachIndexed { index, title ->
-                            Tab(
-                                modifier = Modifier
-                                    .clickable(
-                                        interactionSource = remember { MutableInteractionSource() },
-                                        indication = null,
-                                        onClick = {}
-                                    )
-                                    .background(
-                                        shape = RoundedCornerShape(20.dp),
-                                        color = if (selectedTab == index) {
-                                            AppColors.textPrimary
-                                        } else {
-                                            AppColors.background
-                                        }
-                                    ),
-                                selected = selectedTab == index,
-                                onClick = {
-                                    selectedTab = index
-                                    isMineDebtsState = index == 2
-                                },
-                                text = {
-                                    Text(
-                                        text = title,
-                                        color = if (selectedTab == index) {
-                                            AppColors.background
-                                        } else {
-                                            AppColors.textPrimary
-                                        },
-                                    )
-                                },
-                            )
+                        TabRow(
+                            modifier = Modifier.padding(8.dp),
+                            selectedTabIndex = selectedTab,
+                            indicator = {},
+                            divider = {},
+                            containerColor = AppColors.background,
+                        ) {
+                            tabs.forEachIndexed { index, title ->
+                                Tab(
+                                    modifier = Modifier
+                                        .clickable(
+                                            interactionSource = remember { MutableInteractionSource() },
+                                            indication = null,
+                                            onClick = {}
+                                        )
+                                        .background(
+                                            shape = RoundedCornerShape(20.dp),
+                                            color = if (selectedTab == index) {
+                                                AppColors.textPrimary
+                                            } else {
+                                                AppColors.background
+                                            }
+                                        ),
+                                    selected = selectedTab == index,
+                                    onClick = {
+                                        selectedTab = index
+                                        isMineDebtsState = index == 2
+                                    },
+                                    text = {
+                                        Text(
+                                            text = title,
+                                            color = if (selectedTab == index) {
+                                                AppColors.background
+                                            } else {
+                                                AppColors.textPrimary
+                                            },
+                                        )
+                                    },
+                                )
+                            }
                         }
                     }
 
@@ -197,13 +250,13 @@ fun MainUserScreen(
                             Image(
                                 modifier = Modifier
                                     .size(250.dp),
-                                painter = painterResource(R.drawable.ic_money),
+                                painter = painterResource(R.drawable.ic_trade),
                                 contentDescription = null,
                                 colorFilter = ColorFilter.tint(AppColors.accentPrimary)
                             )
                             Text(
                                 color = AppColors.textPrimary,
-                                text = "Еще нет записей о долгах, создать?",
+                                text = stringResource(R.string.empty_debts),
                                 fontSize = 24.sp,
                                 style = MaterialTheme.typography.bodyLarge,
                                 textAlign = TextAlign.Center,
@@ -230,9 +283,11 @@ fun MainUserScreen(
                             item { Spacer(Modifier.size(12.dp)) }
 
                             items(filteredDebtors.size) { index ->
+                                val debtor = filteredDebtors[index]
+
                                 DebtorCard(
-                                    isMine = data[index].isMine,
-                                    debt = data[index],
+                                    isMine = debtor.isMine,
+                                    debt = debtor,
                                     onDeleteDebtorClick = {
                                         selectedDebt = it
                                         showDeleteDialog = true
@@ -251,6 +306,8 @@ fun MainUserScreen(
                                         editedDebt = debtor
                                         isMineDebtsState = debtor.isMine
                                         showBottomSheet = true
+
+                                        debugLog(debtor.isMine)
                                     }
                                 )
                             }
@@ -271,7 +328,7 @@ fun MainUserScreen(
 
                         Text(
                             color = AppColors.textPrimary,
-                            text = "Загрузка долгов...",
+                            text = stringResource(R.string.loading_debts),
                             fontSize = 24.sp,
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
@@ -305,7 +362,7 @@ fun MainUserScreen(
                         )
                         Text(
                             color = AppColors.textPrimary,
-                            text = "Ошибка загрузки, повторить?",
+                            text = stringResource(R.string.error_loading),
                             fontSize = 24.sp,
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
@@ -323,7 +380,7 @@ fun MainUserScreen(
                 .padding(36.dp)
                 .size(56.dp)
                 .align(Alignment.BottomEnd)
-                .background(shape = CircleShape, color = Color.White),
+                .background(shape = CircleShape, color = AppColors.accentPrimary),
             onClick = {
                 isMineDebtsState = selectedTab == 2
                 editedDebt = null
@@ -331,10 +388,10 @@ fun MainUserScreen(
             }
         ) {
             Icon(
-                modifier = Modifier.size(56.dp),
+                modifier = Modifier.size(48.dp),
                 contentDescription = "",
-                tint = Color.Black,
-                painter = painterResource(R.drawable.baseline_add_circle_24)
+                tint = AppColors.background,
+                painter = painterResource(R.drawable.cross_add)
             )
         }
 
@@ -384,7 +441,7 @@ fun MainUserScreen(
                 DebtorForm(
                     debt = editedDebt,
                     isMine = isMineDebtsState,
-                    color = editedDebtorBGcolor,
+                    color = editedDebtorBGcolor ?: AppColors.accentPrimary,
                     onSaveComplete = {
                         if (editedDebt != null) {
                             mainDebtorViewModel.updateDebt(

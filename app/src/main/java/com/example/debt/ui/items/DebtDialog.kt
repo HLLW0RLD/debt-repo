@@ -15,9 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.debt.R
 
 @Composable
 fun DebtDialog(
@@ -42,7 +44,7 @@ fun DebtDialog(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = title ?: "Удалить запись?",
+                    text = title ?: stringResource(R.string.delete_dialog_title),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -57,7 +59,7 @@ fun DebtDialog(
                             contentColor = MaterialTheme.colorScheme.onSurface
                         )
                     ) {
-                        Text(dismissTitle ?: "Отменить")
+                        Text(dismissTitle ?: stringResource(R.string.cancel_button))
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -68,7 +70,7 @@ fun DebtDialog(
                             contentColor = MaterialTheme.colorScheme.error
                         )
                     ) {
-                        Text(confirmTitle ?: "Удалить")
+                        Text(confirmTitle ?: stringResource(R.string.delete))
                     }
                 }
             }

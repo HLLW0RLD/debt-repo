@@ -19,11 +19,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.debt.R
 import com.example.debt.data.model.Debt
-import com.example.debt.ui.items.baseElements.DebtRadioButton
-import com.example.debt.ui.items.baseElements.DebtTextButton
 import com.example.debt.ui.theme.AppColors
 
 @Composable
@@ -39,11 +39,11 @@ fun PaymentDialog(
     AlertDialog(
         containerColor = AppColors.background,
         onDismissRequest = onDismiss,
-        title = { Text(text = "Операция с долгом") },
+        title = { Text(text = stringResource(R.string.payment_dialog_title)) },
         text = {
             Column {
-                Text("Должник: ${debt.name}")
-                Text("Текущий долг: ${debt.debtAmount}")
+                Text("${stringResource(R.string.debtor_label)}: ${debt.name}")
+                Text("${stringResource(R.string.current_debt_label)}: ${debt.debtAmount}")
 
                 Spacer(Modifier.height(16.dp))
 
@@ -62,7 +62,7 @@ fun PaymentDialog(
                         amount = it
                             .trim()
                             .replace("-", "") },
-                    label = { Text("Сумма") },
+                    label = { Text(stringResource(R.string.amount_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
@@ -75,7 +75,7 @@ fun PaymentDialog(
                         selected = !isDebt,
                         onClick = { isDebt = false },
                         color = color,
-                        text = "Оплата займа"
+                        text = stringResource(R.string.payment_loan)
                     )
 
                     Spacer(Modifier.width(16.dp))
@@ -83,7 +83,7 @@ fun PaymentDialog(
                         selected = isDebt,
                         onClick = { isDebt = true },
                         color = color,
-                        text = "Новый займ"
+                        text = stringResource(R.string.new_loan)
                     )
                 }
             }
@@ -91,7 +91,7 @@ fun PaymentDialog(
         confirmButton = {
             DebtTextButton(
                 color = color,
-                text = "Подтвердить",
+                text = stringResource(R.string.confirm_button),
                 enabled = amount.toDoubleOrNull() != null
             ) {
                 amount.toDoubleOrNull()?.let {
@@ -103,7 +103,7 @@ fun PaymentDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(
-                    text = "Отмена",
+                    text = stringResource(R.string.cancel_button),
                     color = AppColors.textPrimary
                 )
             }

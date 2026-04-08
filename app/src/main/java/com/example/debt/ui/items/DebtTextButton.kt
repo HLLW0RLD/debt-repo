@@ -1,13 +1,17 @@
-package com.example.debt.ui.items.baseElements
+package com.example.debt.ui.items
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.example.debt.ui.theme.AppColors
 
 @Composable
@@ -29,10 +33,12 @@ fun DebtTextButton(
             onClick()
         },
         enabled = enabled,
-
         border = border,
         contentPadding = contentPadding,
-        modifier = Modifier.then(modifier)
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .then(modifier)
+            .height(48.dp)
     ) {
         Text(
             text = text,

@@ -22,11 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.debt.R
-import com.example.debt.ui.items.baseElements.DebtRadioButton
+import com.example.debt.ui.items.DebtRadioButton
 import com.example.debt.ui.theme.AppColors
 import com.example.debt.ui.theme.ThemeMode
 import org.koin.androidx.compose.koinViewModel
@@ -48,18 +49,12 @@ fun AppSettingsScreen(
     ) {
         Spacer(Modifier.size(50.dp))
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .background(AppColors.background)
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp),
+                .fillMaxWidth(),
         ) {
-            Text(
-                text = "debt",
-                fontSize = 48.sp,
-                color = AppColors.textPrimary,
-                fontWeight = FontWeight.Bold,
-            )
             IconButton(onClick = onBackClick) {
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_back),
@@ -67,25 +62,25 @@ fun AppSettingsScreen(
                     contentDescription = "",
                 )
             }
+            Text(
+                text = stringResource(R.string.settings_title),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = AppColors.textPrimary,
+            )
         }
-        Divider(Modifier
-            .fillMaxWidth()
-            .height(2.dp)
-            .background(Color.Black)
-        )
+
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = "Выбор темы",
+                text = stringResource(R.string.theme_selection),
                 color = AppColors.textPrimary,
                 modifier = Modifier.padding(8.dp)
             )
 
-            Divider()
-
             ThemeOption(
-                text = "Системная",
+                text = stringResource(R.string.theme_system),
                 selected = selectedTheme == ThemeMode.SYSTEM,
                 onClick = {
                     viewModel.setTheme(ThemeMode.SYSTEM)
@@ -93,7 +88,7 @@ fun AppSettingsScreen(
             )
 
             ThemeOption(
-                text = "Светлая",
+                text = stringResource(R.string.theme_light),
                 selected = selectedTheme == ThemeMode.LIGHT,
                 onClick = {
                     viewModel.setTheme(ThemeMode.LIGHT)
@@ -101,7 +96,7 @@ fun AppSettingsScreen(
             )
 
             ThemeOption(
-                text = "Темная",
+                text = stringResource(R.string.theme_dark),
                 selected = selectedTheme == ThemeMode.DARK,
                 onClick = {
                     viewModel.setTheme(ThemeMode.DARK)
@@ -109,7 +104,7 @@ fun AppSettingsScreen(
             )
 
             ThemeOption(
-                text = "Цветная",
+                text = stringResource(R.string.theme_colored),
                 selected = selectedTheme == ThemeMode.COLOR,
                 onClick = {
                     viewModel.setTheme(ThemeMode.COLOR)
@@ -117,25 +112,19 @@ fun AppSettingsScreen(
             )
         }
 
+        Spacer(Modifier.size(16.dp))
 
-        Divider(Modifier
-            .fillMaxWidth()
-            .height(2.dp)
-            .background(Color.Black)
-        )
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = "Рассчет долгов",
+                text = stringResource(R.string.debt_calculation),
                 color = AppColors.textPrimary,
                 modifier = Modifier.padding(8.dp)
             )
 
-            Divider()
-
             ThemeOption(
-                text = "Автоудаление выплаченных долгов",
+                text = stringResource(R.string.auto_delete_paid_debts),
                 selected = debtAutoDelete,
                 onClick = {
                     viewModel.debtAutoDelete(true)
@@ -143,7 +132,7 @@ fun AppSettingsScreen(
             )
 
             ThemeOption(
-                text = "Авторассчет переплат и перезаемов",
+                text = stringResource(R.string.auto_calculate_overpayments),
                 selected = debtAutoCount,
                 onClick = {
                     viewModel.debtAutoCount(true)
@@ -151,7 +140,7 @@ fun AppSettingsScreen(
             )
 
             ThemeOption(
-                text = "ничего",
+                text = stringResource(R.string.nothing),
                 selected = !debtAutoCount && !debtAutoDelete,
                 onClick = {
                     viewModel.debtAutoCount(false)
@@ -171,7 +160,11 @@ fun ThemeOption(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(
+                onClick = onClick,
+                indication = null,
+                interactionSource = null
+            )
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

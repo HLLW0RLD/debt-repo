@@ -3,19 +3,29 @@ package com.example.debt.app.ui.items
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.debt.R
 import com.example.debt.data.model.Debt
-import com.example.debt.ui.items.baseElements.DatePickerField
-import com.example.debt.ui.items.baseElements.DebtOutlinedTextField
-import com.example.debt.ui.items.baseElements.DebtRadioButton
-import com.example.debt.ui.items.baseElements.DebtTextButton
+import com.example.debt.ui.items.DebtDateTimePickerField
+import com.example.debt.ui.items.DebtOutlinedTextField
+import com.example.debt.ui.items.DebtRadioButton
+import com.example.debt.ui.items.DebtTextButton
 import com.example.debt.ui.theme.AppColors
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -23,7 +33,7 @@ import com.example.debt.ui.theme.AppColors
 fun DebtorForm(
     debt: Debt? = null,
     isMine: Boolean = false,
-    color: Color? = null,
+    color: Color = AppColors.accentPrimary,
     onSaveComplete: (Debt) -> Unit
 ) {
 
@@ -42,11 +52,44 @@ fun DebtorForm(
             .background(AppColors.background)
             .padding(16.dp)
     ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .background(AppColors.background)
+                .fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(R.string.debtor_form_title),
+                fontSize = 24.sp,
+                color = AppColors.textPrimary,
+            )
+//            IconButton(
+//                onClick = {}
+//            ) {
+//                Icon(
+//                    painter = painterResource(R.drawable.gear),
+//                    tint = AppColors.textPrimary,
+//                    contentDescription = "",
+//                )
+//            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+
         DebtOutlinedTextField(
-            color = color,
+            cursorColor = color,
+            focusedLabelColor = color,
+            focusedBorderColor = color,
+            unfocusedBorderColor = color,
+            focusedPlaceholderColor = color,
+            shape = RoundedCornerShape(12.dp),
             value = name.value,
             onValueChange = { name.value = it },
-            label = "Имя должника",
+            label = if (isMineState.value) {
+                stringResource(R.string.label_i_owe_to)
+            } else {
+                stringResource(R.string.label_owe_to_me)
+            },
         )
 
         Row(
@@ -58,54 +101,75 @@ fun DebtorForm(
                 selected = !isMineState.value,
                 onClick = { isMineState.value = false },
                 color = color,
-                text = "Мне должны"
+                text = stringResource(R.string.radio_owe_to_me)
             )
 
             DebtRadioButton(
                 selected = isMineState.value,
                 onClick = { isMineState.value = true },
                 color = color,
-                text = "Я должен"
+                text = stringResource(R.string.radio_i_owe)
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
         DebtOutlinedTextField(
-            color = color,
+            cursorColor = color,
+            focusedLabelColor = color,
+            focusedBorderColor = color,
+            unfocusedBorderColor = color,
+            focusedPlaceholderColor = color,
+            shape = RoundedCornerShape(12.dp),
             value = telegramNick.value,
             onValueChange = { telegramNick.value = it },
-            label = "Ник в Telegram (для перехода в приложение)",
+            label = stringResource(R.string.label_telegram_nick),
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         DebtOutlinedTextField(
-            color = color,
+            cursorColor = color,
+            focusedLabelColor = color,
+            focusedBorderColor = color,
+            unfocusedBorderColor = color,
+            focusedPlaceholderColor = color,
+            shape = RoundedCornerShape(12.dp),
             value = debtAmount.value,
+            enabled = debt == null,
             onValueChange = {
                 debtAmount.value = it
                     .trim()
                     .replace("-", "")
             },
-            label = "Сумма долга",
+            label = stringResource(R.string.label_debt_amount),
             keyboardType = KeyboardType.Number
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        DatePickerField(
-            label = "Дата возврата",
+        DebtDateTimePickerField(
+            label = stringResource(R.string.label_return_date),
             date = returnDate.value,
-            color = color,
-            onDateChanged = { returnDate.value = it }
+            iconColor = color,
+            focusedLabelColor = color,
+            focusedBorderColor = color,
+            unfocusedBorderColor = color,
+            focusedPlaceholderColor = color,
+            shape = RoundedCornerShape(12.dp),
+            onDateChanged = { returnDate.value = it },
+            modifier = Modifier
+                .fillMaxWidth()
         )
 
         DebtOutlinedTextField(
-            color = color,
+            cursorColor = color,
+            focusedLabelColor = color,
+            focusedBorderColor = color,
+            unfocusedBorderColor = color,
+            focusedPlaceholderColor = color,
+            shape = RoundedCornerShape(12.dp),
             value = comment.value,
             onValueChange = { comment.value = it },
-            label = "Комментарий (необязательно)",
+            label = stringResource(R.string.label_comment_optional),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -113,18 +177,18 @@ fun DebtorForm(
         DebtTextButton(
             color = color,
             modifier = Modifier.fillMaxWidth(),
-            text = "Сохранить",
+            text = stringResource(R.string.save_button),
             enabled = name.value.isNotBlank() && debtAmount.value.toDoubleOrNull() != null,
         ) {
             if (isEdit) {
                 val debt = Debt(
                     id = debt.id,
                     isMine = isMineState.value,
-                    telegramNick = if (telegramNick.value.isNotEmpty()) telegramNick.value else debt.telegramNick,
-                    name = if (name.value.isNotEmpty()) name.value else debt.name,
+                    telegramNick = telegramNick.value.ifEmpty { debt.telegramNick },
+                    name = name.value.ifEmpty { debt.name },
                     debtAmount = debt.debtAmount,
-                    returnDate = if (returnDate.value.isNotEmpty()) returnDate.value else debt.returnDate,
-                    comment = if (comment.value.isNotEmpty()) comment.value else debt.comment
+                    returnDate = returnDate.value.ifEmpty { debt.returnDate },
+                    comment = comment.value.ifEmpty { debt.comment }
                 )
                 onSaveComplete(debt)
             } else {

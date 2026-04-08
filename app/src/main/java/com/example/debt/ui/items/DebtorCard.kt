@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -114,7 +115,7 @@ fun DebtorCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Icon(
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(24.dp),
                         contentDescription = "",
                         painter = if (isMine) painterResource(R.drawable.ic_graph_down) else painterResource(R.drawable.ic_graph_up),
                         tint = if (isMine) AppColors.error else AppColors.success
@@ -134,19 +135,25 @@ fun DebtorCard(
                     modifier = Modifier
                         .size(32.dp)
                         .padding(4.dp)
-                        .clickable { onDeleteDebtorClick(debt) }
+                        .clickable(
+                            indication = null,
+                            interactionSource = null
+                        ) { onDeleteDebtorClick(debt) }
                 )
             }
 
             Row(
                 modifier = Modifier
                     .padding(start = 8.dp, end = 4.dp, bottom = 8.dp)
-                    .clickable { showHistory = !showHistory },
+                    .clickable(
+                        indication = null,
+                        interactionSource = null
+                    ) { showHistory = !showHistory },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    text = "Долг: ${debt.debtAmount} ₽",
+                    text = stringResource(R.string.debt_label, debt.debtAmount),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = AppColors.textPrimary
@@ -210,14 +217,14 @@ fun DebtorCard(
         ) {
 
             Text(
-                text = "Дата займа: ${debt.loanDate}",
+                text = stringResource(R.string.loan_date_label, debt.loanDate),
                 style = MaterialTheme.typography.bodyMedium
             )
 
             if (debt.returnDate?.setColorDate() != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Дата возврата: ${debt.returnDate}",
+                    text = stringResource(R.string.return_date_label, debt.returnDate),
                     style = MaterialTheme.typography.bodyMedium,
                     color = debt.returnDate.setColorDate() ?: Color.White
                 )
@@ -226,7 +233,7 @@ fun DebtorCard(
             if (!debt.comment.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Комментарий: ${debt.comment}",
+                    text = stringResource(R.string.comment_label, debt.comment ?: ""),
                     style = MaterialTheme.typography.bodyMedium,
                     fontStyle = FontStyle.Italic
                 )
@@ -248,7 +255,10 @@ fun DebtorCard(
                             shape = RoundedCornerShape(20.dp),
                             color = AppColors.background
                         )
-                        .clickable { onPaymentClick(debt) }
+                        .clickable(
+                            indication = null,
+                            interactionSource = null
+                        ) { onPaymentClick(debt) }
                 )
 
                 if (!debt.telegramNick.isNullOrEmpty()) {
@@ -261,7 +271,10 @@ fun DebtorCard(
                                 shape = RoundedCornerShape(20.dp),
                                 color = Color.White
                             )
-                            .clickable { debt.telegramNick.openTelegramChat() }
+                            .clickable(
+                                indication = null,
+                                interactionSource = null
+                            ) { debt.telegramNick.openTelegramChat() }
                     )
                 }
             }
