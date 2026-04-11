@@ -34,7 +34,6 @@ fun DebtRadioButton(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .then(modifier)
-            .padding(vertical = 4.dp)
             .clickable(
                 interactionSource = null,
                 indication = null

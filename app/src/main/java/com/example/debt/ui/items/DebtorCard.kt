@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -117,7 +118,7 @@ fun DebtorCard(
                     Icon(
                         modifier = Modifier.size(24.dp),
                         contentDescription = "",
-                        painter = if (isMine) painterResource(R.drawable.ic_graph_down) else painterResource(R.drawable.ic_graph_up),
+                        painter = if (isMine) painterResource(R.drawable.ic_wallet_up) else painterResource(R.drawable.ic_wallet_down),
                         tint = if (isMine) AppColors.error else AppColors.success
                     )
                     Spacer(Modifier.size(4.dp))
@@ -245,21 +246,28 @@ fun DebtorCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Image(
-                    contentDescription = "",
-                    painter = painterResource(R.drawable.ic_money),
-                    colorFilter = ColorFilter.tint(AppColors.accentPrimary),
+                Box(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            shape = RoundedCornerShape(20.dp),
+                            shape = RoundedCornerShape(50.dp),
                             color = AppColors.background
                         )
                         .clickable(
                             indication = null,
                             interactionSource = null
-                        ) { onPaymentClick(debt) }
-                )
+                        ) { onPaymentClick(debt) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    val color = if (PreferenceCache.selectedTheme == ThemeMode.COLOR) cardColor else AppColors.accentPrimary
+                    Image(
+                        contentDescription = "",
+                        painter = painterResource(R.drawable.ic_pay),
+                        colorFilter = ColorFilter.tint(color),
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
+                }
 
                 if (!debt.telegramNick.isNullOrEmpty()) {
                     Image(

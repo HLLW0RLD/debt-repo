@@ -85,11 +85,7 @@ fun DebtorForm(
             shape = RoundedCornerShape(12.dp),
             value = name.value,
             onValueChange = { name.value = it },
-            label = if (isMineState.value) {
-                stringResource(R.string.label_i_owe_to)
-            } else {
-                stringResource(R.string.label_owe_to_me)
-            },
+            label = stringResource(R.string.label_name_debt),
         )
 
         Row(

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">debt</string>
 
-    <string name="debt_title">Дебтор</string>
+    <string name="debt_title">Debtor</string>
     <string name="tab_all">все</string>
     <string name="tab_owe_me">мне должны</string>
     <string name="tab_i_owe">я должен</string>
@@ -28,8 +28,7 @@
     <string name="new_loan">Новый займ</string>
 
     <string name="debtor_form_title">Запись о должнике</string>
-    <string name="label_i_owe_to">Имя того кому я должен</string>
-    <string name="label_owe_to_me">Имя того кто мне должен</string>
+    <string name="label_name_debt">Имя</string>
     <string name="label_telegram_nick">Никнейм в Telegram (для перехода в диалог)</string>
     <string name="label_debt_amount">Сумма долга</string>
     <string name="label_return_date">Дата возврата</string>

@@ -55,7 +55,9 @@ fun AppSettingsScreen(
                 .background(AppColors.background)
                 .fillMaxWidth(),
         ) {
-            IconButton(onClick = onBackClick) {
+            IconButton(
+                onClick = onBackClick
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_back),
                     tint = AppColors.textPrimary,
@@ -165,7 +167,7 @@ fun ThemeOption(
                 indication = null,
                 interactionSource = null
             )
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         DebtRadioButton(

@@ -157,15 +157,32 @@ fun MainUserScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .background(AppColors.background)
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
+                    .fillMaxWidth(),
             ) {
-                Text(
-                    text = stringResource(R.string.debt_title),
-                    fontSize = 24.sp,
-                    color = AppColors.textPrimary,
-                    fontWeight = FontWeight.Bold,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .background(AppColors.background),
+                ) {
+                    IconButton(
+                        onClick = {
+                            // pro version
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_trade),
+                            tint = AppColors.accentPrimary,
+                            contentDescription = "",
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.debt_title),
+                        fontSize = 24.sp,
+                        color = AppColors.textPrimary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
                 IconButton(onClick = onSettingsClick) {
                     Icon(
                         painter = painterResource(R.drawable.gear),
@@ -249,7 +266,7 @@ fun MainUserScreen(
                         ) {
                             Image(
                                 modifier = Modifier
-                                    .size(250.dp),
+                                    .size(200.dp),
                                 painter = painterResource(R.drawable.ic_trade),
                                 contentDescription = null,
                                 colorFilter = ColorFilter.tint(AppColors.accentPrimary)
