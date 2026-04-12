@@ -35,21 +35,29 @@ class DebtRepositoryImpl(
         }
     }
 
-    override suspend fun addDebt(id: String, amount: Double) {
+    override suspend fun addDebt(id: String, amount: Double): List<Debt> {
         val response = apiService.addDebt(id, amount)
         return if (response.isSuccessful) {
             debugLog("")
+            response.body()?.let { debtResponses ->
+                debtResponses.map { it.toModel() }
+            } ?: emptyList()
         } else {
             errorLog("Failed to add debt: ${response.code()}")
+            emptyList()
         }
     }
 
-    override suspend fun payDebt(id: String, amount: Double) {
+    override suspend fun payDebt(id: String, amount: Double): List<Debt> {
         val response = apiService.payDebt(id, amount)
         return if (response.isSuccessful) {
             debugLog("")
+            response.body()?.let { debtResponses ->
+                debtResponses.map { it.toModel() }
+            } ?: emptyList()
         } else {
             errorLog("Failed to pay debt: ${response.code()}")
+            emptyList()
         }
     }
 

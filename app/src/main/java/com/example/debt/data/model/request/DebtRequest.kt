@@ -1,5 +1,6 @@
 package com.example.debt.data.model.request
 
+import com.example.debt.utils.getCurrentDateTime
 import java.util.UUID
 
 data class DebtRequest(
@@ -8,7 +9,7 @@ data class DebtRequest(
     val isMine: Boolean,
     val telegramNick: String?,
     val debtAmount: Double,
-    val loanDate: String,
+    val loanDate: String = getCurrentDateTime(),
     val returnDate: String?,
     val comment: String?,
     val initialTransaction: TransactionRequest

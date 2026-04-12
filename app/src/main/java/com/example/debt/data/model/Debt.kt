@@ -9,7 +9,7 @@ data class Debt(
     val isMine: Boolean = false,
     val telegramNick: String?,
     val debtAmount: Double,
-    var loanDate: String = getCurrentDateTime(),
+    var loanDate: String = "",
     val returnDate: String? = "", // опционально
     var comment: String? = "", // опционально
     var transactions: List<Transaction> = listOf()

@@ -19,7 +19,7 @@ val apiModule = module {
 //    single {
 //        AuthInterceptor {
 //            runBlocking {
-////                PersonalDataManager.getTokenFromCache()
+//                PersonalDataManager.getTokenFromCache()
 //            }
 //        }
 //    }
@@ -35,7 +35,7 @@ val apiModule = module {
 
     single {
         Retrofit.Builder()
-            .baseUrl("https://google.com/")
+            .baseUrl("https://feel-u.ru/debts-api/")
             .client(get())
             .addConverterFactory(GsonConverterFactory.create())
             .build()

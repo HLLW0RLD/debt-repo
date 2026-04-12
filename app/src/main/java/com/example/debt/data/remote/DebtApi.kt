@@ -30,13 +30,13 @@ interface DebtApi {
     suspend fun addDebt(
         @Path("id") id: String,
         @Body amount: Double
-    ): Response<Unit>
+    ): Response<List<DebtResponse>>
 
     @POST("api/debts/{id}/pay-debt")
     suspend fun payDebt(
         @Path("id") id: String,
         @Body amount: Double
-    ): Response<Unit>
+    ): Response<List<DebtResponse>>
 
     @PATCH("api/debts/{id}")
     suspend fun updateDebt(
