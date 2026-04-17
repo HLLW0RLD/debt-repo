@@ -17,6 +17,8 @@ import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.example.debt.app.utils.LogUtils.errorLog
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
@@ -35,11 +37,17 @@ fun Any.toast(msg: Any?, duration: Int = LENGTH_SHORT) {
         .show()
 }
 
-fun getCurrentDateTime(): String {
-    val dateFormat = SimpleDateFormat("HH:mm:ss dd.MM.yyyy")
-    val date = Date()
-    return dateFormat
-        .format(date)
+@RequiresApi(Build.VERSION_CODES.O)
+fun getCurrentDateTime(utc: Boolean = false): String {
+    return if (utc) {
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .withZone(java.time.ZoneOffset.UTC)
+            .format(java.time.Instant.now())
+    } else {
+        LocalDateTime
+        .now(ZoneId.systemDefault())
+            .format(DateTimeFormatter.ofPattern("HH:mm:ss dd.MM.yyyy"))
+    }
 }
 
 fun String.openTelegramChat() {
