@@ -27,7 +27,7 @@ fun DebtOutlinedTextField(
     focusedPlaceholderColor: Color = AppColors.accentPrimary,
     unfocusedPlaceholderColor: Color = AppColors.textPrimary,
     focusedLabelColor: Color = AppColors.accentPrimary,
-    unfocusedLabelColor: Color = AppColors.surface,
+    unfocusedLabelColor: Color = AppColors.surfaceSecondary,
     errorLabelColor: Color = AppColors.error,
     focusedBorderColor: Color = AppColors.accentPrimary,
     unfocusedBorderColor: Color = AppColors.textPrimary,

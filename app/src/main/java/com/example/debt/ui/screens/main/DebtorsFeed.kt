@@ -1,6 +1,7 @@
 package com.example.debt.app.ui.screens
 
 import android.os.Build
+import android.view.WindowInsets
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -15,11 +16,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -31,6 +34,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +45,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,24 +67,32 @@ import com.example.debt.data.model.Debt
 import com.example.debt.app.ui.items.DebtorCard
 import com.example.debt.app.ui.items.DebtorForm
 import com.example.debt.app.utils.LogUtils.debugLog
+import com.example.debt.ui.items.AnimatedFloatingActionButton
 import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.DebtDialog
 import com.example.debt.ui.screens.main.DebtUiState
-import com.example.debt.ui.screens.main.MainDebtorViewModel
+import com.example.debt.ui.screens.main.DebtorsFeedViewModel
+import com.example.debt.ui.screens.settings.Settings
 import com.example.debt.ui.theme.AppColors
 import com.example.debt.utils.PreferenceCache
 import com.example.debt.ui.theme.interfaceColorById
+import com.example.debt.utils.LocalNavController
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
+
+@Serializable
+object DebtorsFeed
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainUserScreen(
-    onSettingsClick: () -> Unit
+fun DebtorsFeedScreen(
+    debtorsFeedViewModel: DebtorsFeedViewModel = koinViewModel()
 ) {
-    val mainDebtorViewModel: MainDebtorViewModel = koinViewModel()
+    val navController = LocalNavController.current
 
-    val debtors by mainDebtorViewModel.debtors.collectAsState()
+    val debtors by debtorsFeedViewModel.debtors.collectAsState()
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var showPaymentDialog by remember { mutableStateOf(false) }
@@ -138,12 +152,29 @@ fun MainUserScreen(
         }
     }
 
-    Box(
+    val pagerState = rememberPagerState(
+        initialPage = selectedTab,
+        pageCount = { tabs.size }
+    )
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(pagerState.currentPage) {
+        selectedTab = pagerState.currentPage
+        isMineDebtsState = selectedTab == 2
+    }
+
+    PullToRefreshBox(
         modifier = Modifier
             .nestedScroll(nestedScrollConnection)
             .fillMaxSize()
-            .background(AppColors.background),
-        contentAlignment = Alignment.Center
+            .background(AppColors.background)
+            .statusBarsPadding(),
+        contentAlignment = Alignment.Center,
+        isRefreshing = debtors is DebtUiState.Loading,
+        onRefresh = {
+            debtorsFeedViewModel.loadAllDebts()
+        },
     ) {
         Column(
             modifier = Modifier
@@ -151,7 +182,6 @@ fun MainUserScreen(
                 .fillMaxSize()
                 .background(AppColors.background),
         ) {
-            Spacer(Modifier.size(50.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -183,7 +213,10 @@ fun MainUserScreen(
                         fontWeight = FontWeight.Bold,
                     )
                 }
-                IconButton(onClick = onSettingsClick) {
+                IconButton(onClick = {
+                    navController.navigate(Settings)
+                }
+                ) {
                     Icon(
                         painter = painterResource(R.drawable.gear),
                         tint = AppColors.textPrimary,
@@ -214,37 +247,38 @@ fun MainUserScreen(
                             containerColor = AppColors.background,
                         ) {
                             tabs.forEachIndexed { index, title ->
-                                Tab(
+                                val isSelected = selectedTab == index
+
+                                Box(
                                     modifier = Modifier
-                                        .clickable(
-                                            interactionSource = remember { MutableInteractionSource() },
-                                            indication = null,
-                                            onClick = {}
-                                        )
                                         .background(
                                             shape = RoundedCornerShape(20.dp),
-                                            color = if (selectedTab == index) {
+                                            color = if (isSelected) {
                                                 AppColors.textPrimary
                                             } else {
                                                 AppColors.background
                                             }
-                                        ),
-                                    selected = selectedTab == index,
-                                    onClick = {
-                                        selectedTab = index
-                                        isMineDebtsState = index == 2
-                                    },
-                                    text = {
-                                        Text(
-                                            text = title,
-                                            color = if (selectedTab == index) {
-                                                AppColors.background
-                                            } else {
-                                                AppColors.textPrimary
-                                            },
                                         )
-                                    },
-                                )
+                                        .clickable(
+                                            interactionSource = remember { MutableInteractionSource() },
+                                            indication = null
+                                        ) {
+                                            scope.launch {
+                                                pagerState.animateScrollToPage(index)
+                                            }
+                                        }
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = title,
+                                        color = if (isSelected) {
+                                            AppColors.background
+                                        } else {
+                                            AppColors.textPrimary
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
@@ -283,52 +317,57 @@ fun MainUserScreen(
                             )
                         }
                     } else {
-                        val filteredDebtors = remember(data, selectedTab) {
-                            when (selectedTab) {
+
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize()
+                        ) { page ->
+
+                            val filteredDebtors = when (page) {
                                 1 -> data.filter { !it.isMine }
                                 2 -> data.filter { it.isMine }
                                 else -> data
                             }
-                        }
 
-                        LazyColumn(
-                            modifier = Modifier
-                                .background(AppColors.background)
-                                .fillMaxSize()
-                                .padding(6.dp),
-                        ) {
-                            item { Spacer(Modifier.size(12.dp)) }
+                            LazyColumn(
+                                modifier = Modifier
+                                    .background(AppColors.background)
+                                    .fillMaxSize()
+                                    .padding(6.dp),
+                            ) {
+                                item { Spacer(Modifier.size(12.dp)) }
 
-                            items(filteredDebtors.size) { index ->
-                                val debtor = filteredDebtors[index]
+                                items(filteredDebtors.size) { index ->
+                                    val debtor = filteredDebtors[filteredDebtors.size - 1 - index]
 
-                                DebtorCard(
-                                    isMine = debtor.isMine,
-                                    debt = debtor,
-                                    onDeleteDebtorClick = {
-                                        selectedDebt = it
-                                        showDeleteDialog = true
-                                    },
-                                    onPaymentClick = { debtor ->
-                                        editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
-                                            interfaceColorById(debtor.id)
-                                        else null
-                                        selectedDebt = debtor
-                                        showPaymentDialog = true
-                                    },
-                                    onEditClick = { debtor ->
-                                        editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
-                                            interfaceColorById(debtor.id)
-                                        else null
-                                        editedDebt = debtor
-                                        isMineDebtsState = debtor.isMine
-                                        showBottomSheet = true
+                                    DebtorCard(
+                                        isMine = debtor.isMine,
+                                        debt = debtor,
+                                        onDeleteDebtorClick = {
+                                            selectedDebt = it
+                                            showDeleteDialog = true
+                                        },
+                                        onPaymentClick = { debtor ->
+                                            editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
+                                                interfaceColorById(debtor.id)
+                                            else null
+                                            selectedDebt = debtor
+                                            showPaymentDialog = true
+                                        },
+                                        onEditClick = { debtor ->
+                                            editedDebtorBGcolor = if (PreferenceCache.isColoredTheme)
+                                                interfaceColorById(debtor.id)
+                                            else null
+                                            editedDebt = debtor
+                                            isMineDebtsState = debtor.isMine
+                                            showBottomSheet = true
 
-                                        debugLog(debtor.isMine)
-                                    }
-                                )
+                                            debugLog(debtor.isMine)
+                                        }
+                                    )
+                                }
+                                item { Spacer(Modifier.size(52.dp)) }
                             }
-                            item { Spacer(Modifier.size(52.dp)) }
                         }
                     }
                 }
@@ -365,7 +404,7 @@ fun MainUserScreen(
                                 indication = null,
                                 interactionSource = null
                             ) {
-                                mainDebtorViewModel.loadAllDebts()
+                                debtorsFeedViewModel.loadAllDebts()
                             },
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
@@ -392,25 +431,20 @@ fun MainUserScreen(
             }
         }
 
-        IconButton(
+        AnimatedFloatingActionButton(
             modifier = Modifier
-                .padding(36.dp)
-                .size(56.dp)
-                .align(Alignment.BottomEnd)
-                .background(shape = CircleShape, color = AppColors.accentPrimary),
+                .padding(bottom = 30.dp, end = 16.dp)
+                .align(Alignment.BottomEnd),
+//            visible = fabVisible && extended,
+            visible = extended,
             onClick = {
                 isMineDebtsState = selectedTab == 2
                 editedDebt = null
                 showBottomSheet = true
-            }
-        ) {
-            Icon(
-                modifier = Modifier.size(48.dp),
-                contentDescription = "",
-                tint = AppColors.background,
-                painter = painterResource(R.drawable.cross_add)
-            )
-        }
+            },
+            icon = painterResource(R.drawable.cross_add),
+            enterDelay = 200
+        )
 
         if (showPaymentDialog) {
             selectedDebt?.let { debtor ->
@@ -424,9 +458,9 @@ fun MainUserScreen(
                     onPayment = { amount, isDebt ->
                         debtor.let { debtor ->
                             if (isDebt) {
-                                mainDebtorViewModel.addDebt(debtor.id, amount)
+                                debtorsFeedViewModel.addDebt(debtor.id, amount)
                             } else {
-                                mainDebtorViewModel.payDebt(debtor.id, amount)
+                                debtorsFeedViewModel.payDebt(debtor.id, amount)
                             }
                         }
                     }
@@ -439,7 +473,7 @@ fun MainUserScreen(
                 onDismiss = { showDeleteDialog = false },
                 onCancel = { showDeleteDialog = false },
                 onConfirm = {
-                    mainDebtorViewModel.deleteDebtor(selectedDebt!!.id)
+                    debtorsFeedViewModel.deleteDebtor(selectedDebt!!.id)
                     showDeleteDialog = false
                 }
             )
@@ -447,12 +481,13 @@ fun MainUserScreen(
 
         if (showBottomSheet) {
             ModalBottomSheet(
+                modifier = Modifier,
                 onDismissRequest = {
                     showBottomSheet = false
                     editedDebt = null
                     editedDebtorBGcolor = null
                 },
-                sheetState = rememberModalBottomSheetState(),
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
                 containerColor = AppColors.background,
             ) {
                 DebtorForm(
@@ -461,7 +496,7 @@ fun MainUserScreen(
                     color = editedDebtorBGcolor ?: AppColors.accentPrimary,
                     onSaveComplete = {
                         if (editedDebt != null) {
-                            mainDebtorViewModel.updateDebt(
+                            debtorsFeedViewModel.updateDebt(
                                 id = it.id,
                                 name = it.name,
                                 isMine = it.isMine,
@@ -472,7 +507,7 @@ fun MainUserScreen(
                             )
                             showBottomSheet = false
                         } else {
-                            mainDebtorViewModel.createDebt(
+                            debtorsFeedViewModel.createDebt(
                                 name = it.name,
                                 isMine = it.isMine,
                                 telegramNick = it.telegramNick,
@@ -487,5 +522,6 @@ fun MainUserScreen(
                 )
             }
         }
+
     }
 }

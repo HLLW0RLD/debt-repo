@@ -276,7 +276,7 @@ fun DebtorCard(
                         modifier = Modifier
                             .size(48.dp)
                             .background(
-                                shape = RoundedCornerShape(20.dp),
+                                shape = RoundedCornerShape(50.dp),
                                 color = Color.White
                             )
                             .clickable(

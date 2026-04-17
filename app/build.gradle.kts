@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.debt"
         minSdk = 25
         targetSdk = 35
-        versionCode = 5
-        versionName = "4.1"
+        versionCode = 6
+        versionName = "5.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -98,6 +98,9 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
+    // swiperefresh
+    implementation(libs.accompanist.swiperefresh)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)

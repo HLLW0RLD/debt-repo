@@ -2,9 +2,9 @@
     <string name="app_name">debt</string>
 
     <string name="debt_title">Debtor</string>
-    <string name="tab_all">все</string>
-    <string name="tab_owe_me">мне должны</string>
-    <string name="tab_i_owe">я должен</string>
+    <string name="tab_all">Все</string>
+    <string name="tab_owe_me">Получу</string>
+    <string name="tab_i_owe">Отдам</string>
     <string name="empty_debts">Еще нет записей о долгах, создать?</string>
     <string name="loading_debts">Загрузка долгов...</string>
     <string name="error_loading">Ошибка загрузки, повторить?</string>

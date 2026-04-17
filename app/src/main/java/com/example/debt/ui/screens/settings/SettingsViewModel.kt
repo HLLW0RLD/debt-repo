@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.KoinComponent
 
-class AppSettingsViewModel : ViewModel(), KoinComponent {
+class SettingsViewModel : ViewModel(), KoinComponent {
 
     private val _autoCountDebts = MutableStateFlow<Boolean>(PreferenceCache.autoCountDebts)
     val autoCountDebts = _autoCountDebts.asStateFlow()

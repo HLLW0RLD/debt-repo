@@ -5,14 +5,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.debt.app.ui.screens.MainUserScreen
-import com.example.debt.ui.navigation.Screen.AppSettings
-import com.example.debt.ui.navigation.Screen.Main
-import com.example.debt.ui.screens.settings.AppSettingsScreen
+import com.example.debt.app.ui.screens.DebtorsFeed
+import com.example.debt.app.ui.screens.DebtorsFeedScreen
+import com.example.debt.ui.screens.settings.Settings
+import com.example.debt.ui.screens.settings.SettingsScreen
 import com.example.debt.ui.theme.AppTheme
+import com.example.debt.utils.LocalNavController
+import com.example.debt.utils.animatedComposable
 
 @RequiresApi(Build.VERSION_CODES.O)
 class MainActivity : ComponentActivity() {
@@ -23,19 +26,23 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 val navController = rememberNavController()
 
-                NavHost(
-                    navController = navController,
-                    startDestination = Main.route
+                CompositionLocalProvider(
+                    LocalNavController provides navController,
                 ) {
-                    composable(Main.route) {
-                        MainUserScreen(
-                            onSettingsClick = { navController.navigate(AppSettings.route) }
-                        )
-                    }
-                    composable(AppSettings.route) {
-                        AppSettingsScreen(
-                            onBackClick = { navController.popBackStack() }
-                        )
+                    NavHost(
+                        navController = navController,
+                        startDestination = DebtorsFeed
+                    ) {
+                        animatedComposable<DebtorsFeed>(
+                            navController = navController
+                        ) {
+                            DebtorsFeedScreen()
+                        }
+                        animatedComposable<Settings>(
+                            navController = navController
+                        ) {
+                            SettingsScreen()
+                        }
                     }
                 }
             }

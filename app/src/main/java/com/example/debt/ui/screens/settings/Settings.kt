@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -20,7 +18,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,17 +27,23 @@ import com.example.debt.R
 import com.example.debt.ui.items.DebtRadioButton
 import com.example.debt.ui.theme.AppColors
 import com.example.debt.ui.theme.ThemeMode
+import com.example.debt.utils.LocalNavController
+import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
-@Composable
-fun AppSettingsScreen(
-    onBackClick: () -> Unit
-) {
-    val viewModel: AppSettingsViewModel = koinViewModel()
+@Serializable
+object Settings
 
-    val debtAutoCount by viewModel.autoCountDebts.collectAsState()
-    val debtAutoDelete by viewModel.debtAutoDelete.collectAsState()
-    val selectedTheme by viewModel.selectedTheme.collectAsState()
+@Composable
+fun SettingsScreen(
+    settingsViewModel: SettingsViewModel = koinViewModel()
+) {
+
+    val navController = LocalNavController.current
+
+    val debtAutoCount by settingsViewModel.autoCountDebts.collectAsState()
+    val debtAutoDelete by settingsViewModel.debtAutoDelete.collectAsState()
+    val selectedTheme by settingsViewModel.selectedTheme.collectAsState()
 
     Column(
         modifier = Modifier
@@ -56,7 +59,9 @@ fun AppSettingsScreen(
                 .fillMaxWidth(),
         ) {
             IconButton(
-                onClick = onBackClick
+                onClick = {
+                    navController.popBackStack()
+                }
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_back),
@@ -85,7 +90,7 @@ fun AppSettingsScreen(
                 text = stringResource(R.string.theme_system),
                 selected = selectedTheme == ThemeMode.SYSTEM,
                 onClick = {
-                    viewModel.setTheme(ThemeMode.SYSTEM)
+                    settingsViewModel.setTheme(ThemeMode.SYSTEM)
                 }
             )
 
@@ -93,7 +98,7 @@ fun AppSettingsScreen(
                 text = stringResource(R.string.theme_light),
                 selected = selectedTheme == ThemeMode.LIGHT,
                 onClick = {
-                    viewModel.setTheme(ThemeMode.LIGHT)
+                    settingsViewModel.setTheme(ThemeMode.LIGHT)
                 }
             )
 
@@ -101,7 +106,7 @@ fun AppSettingsScreen(
                 text = stringResource(R.string.theme_dark),
                 selected = selectedTheme == ThemeMode.DARK,
                 onClick = {
-                    viewModel.setTheme(ThemeMode.DARK)
+                    settingsViewModel.setTheme(ThemeMode.DARK)
                 }
             )
 
@@ -109,7 +114,7 @@ fun AppSettingsScreen(
                 text = stringResource(R.string.theme_colored),
                 selected = selectedTheme == ThemeMode.COLOR,
                 onClick = {
-                    viewModel.setTheme(ThemeMode.COLOR)
+                    settingsViewModel.setTheme(ThemeMode.COLOR)
                 }
             )
         }
@@ -129,7 +134,7 @@ fun AppSettingsScreen(
                 text = stringResource(R.string.auto_delete_paid_debts),
                 selected = debtAutoDelete,
                 onClick = {
-                    viewModel.debtAutoDelete(true)
+                    settingsViewModel.debtAutoDelete(true)
                 }
             )
 
@@ -137,7 +142,7 @@ fun AppSettingsScreen(
                 text = stringResource(R.string.auto_calculate_overpayments),
                 selected = debtAutoCount,
                 onClick = {
-                    viewModel.debtAutoCount(true)
+                    settingsViewModel.debtAutoCount(true)
                 }
             )
 
@@ -145,8 +150,8 @@ fun AppSettingsScreen(
                 text = stringResource(R.string.nothing),
                 selected = !debtAutoCount && !debtAutoDelete,
                 onClick = {
-                    viewModel.debtAutoCount(false)
-                    viewModel.debtAutoDelete(false)
+                    settingsViewModel.debtAutoCount(false)
+                    settingsViewModel.debtAutoDelete(false)
                 }
             )
         }

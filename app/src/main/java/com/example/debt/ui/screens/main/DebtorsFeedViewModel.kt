@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.debt.app.data.repo.DebtRepository
 import com.example.debt.app.utils.LogUtils.errorLog
 import com.example.debt.data.model.Debt
-import com.example.debt.data.model.Transaction
-import com.example.debt.data.model.TransactionType
 import com.example.debt.data.model.request.DebtRequest
 import com.example.debt.data.model.request.DebtUpdateRequest
 import com.example.debt.data.model.request.TransactionRequest
@@ -15,7 +13,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 sealed class DebtUiState {
     object Loading : DebtUiState()
@@ -23,7 +20,7 @@ sealed class DebtUiState {
     data class Error(val message: String) : DebtUiState()
 }
 
-class MainDebtorViewModel(
+class DebtorsFeedViewModel(
     private val repository: DebtRepository
 ) : ViewModel() {
 

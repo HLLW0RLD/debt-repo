@@ -7,12 +7,14 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.example.debt.App
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.core.net.toUri
+import androidx.navigation.NavController
 import com.example.debt.app.utils.LogUtils.errorLog
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -20,6 +22,10 @@ import java.time.temporal.ChronoUnit
 
 val LENGTH_LONG = Toast.LENGTH_LONG
 val LENGTH_SHORT = Toast.LENGTH_SHORT
+
+val LocalNavController =
+    staticCompositionLocalOf<NavController> { throw IllegalStateException("No NavController found") }
+
 
 fun Any.toast(msg: Any?, duration: Int = LENGTH_SHORT) {
     Toast.makeText(
