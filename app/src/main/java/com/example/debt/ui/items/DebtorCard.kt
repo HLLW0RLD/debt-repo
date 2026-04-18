@@ -273,11 +273,17 @@ fun DebtorCard(
                     Image(
                         contentDescription = "",
                         painter = painterResource(R.drawable.ic_telegram),
+                        colorFilter = ColorFilter
+                            .tint(if (PreferenceCache.selectedTheme == ThemeMode.COLOR) {
+                                cardColor
+                            } else {
+                                AppColors.surface
+                            }),
                         modifier = Modifier
                             .size(48.dp)
                             .background(
                                 shape = RoundedCornerShape(50.dp),
-                                color = Color.White
+                                color = AppColors.background
                             )
                             .clickable(
                                 indication = null,

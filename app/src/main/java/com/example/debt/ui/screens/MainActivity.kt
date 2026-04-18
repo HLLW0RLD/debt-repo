@@ -5,7 +5,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -15,6 +21,7 @@ import com.example.debt.ui.screens.settings.Settings
 import com.example.debt.ui.screens.settings.SettingsScreen
 import com.example.debt.ui.theme.AppTheme
 import com.example.debt.utils.LocalNavController
+import com.example.debt.utils.TopAlertHost
 import com.example.debt.utils.animatedComposable
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -29,20 +36,30 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(
                     LocalNavController provides navController,
                 ) {
-                    NavHost(
-                        navController = navController,
-                        startDestination = DebtorsFeed
+                    Box(
+                        Modifier.fillMaxSize(),
                     ) {
-                        animatedComposable<DebtorsFeed>(
-                            navController = navController
+                        NavHost(
+                            navController = navController,
+                            startDestination = DebtorsFeed
                         ) {
-                            DebtorsFeedScreen()
+                            animatedComposable<DebtorsFeed>(
+                                navController = navController
+                            ) {
+                                DebtorsFeedScreen()
+                            }
+                            animatedComposable<Settings>(
+                                navController = navController
+                            ) {
+                                SettingsScreen()
+                            }
                         }
-                        animatedComposable<Settings>(
-                            navController = navController
-                        ) {
-                            SettingsScreen()
-                        }
+
+                        TopAlertHost(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .windowInsetsPadding(WindowInsets.statusBars)
+                        )
                     }
                 }
             }

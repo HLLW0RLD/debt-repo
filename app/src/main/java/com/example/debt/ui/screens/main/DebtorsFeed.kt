@@ -1,7 +1,6 @@
 package com.example.debt.app.ui.screens
 
 import android.os.Build
-import android.view.WindowInsets
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -16,13 +15,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -31,11 +30,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,6 +74,7 @@ import com.example.debt.ui.theme.AppColors
 import com.example.debt.utils.PreferenceCache
 import com.example.debt.ui.theme.interfaceColorById
 import com.example.debt.utils.LocalNavController
+import com.example.debt.utils.validateTelegram
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
@@ -93,6 +91,7 @@ fun DebtorsFeedScreen(
     val navController = LocalNavController.current
 
     val debtors by debtorsFeedViewModel.debtors.collectAsState()
+    val refresh by debtorsFeedViewModel.refresh.collectAsState()
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var showPaymentDialog by remember { mutableStateOf(false) }
@@ -114,7 +113,7 @@ fun DebtorsFeedScreen(
 
     var showThemeDialog by remember { mutableStateOf(false) }
 
-    val scrollThreshold = 24f
+    val scrollThreshold = 56f
     var accumulatedScroll by remember { mutableFloatStateOf(0f) }
 
     var extended by remember { mutableStateOf(true) }
@@ -158,6 +157,7 @@ fun DebtorsFeedScreen(
     )
 
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(pagerState.currentPage) {
         selectedTab = pagerState.currentPage
@@ -171,7 +171,7 @@ fun DebtorsFeedScreen(
             .background(AppColors.background)
             .statusBarsPadding(),
         contentAlignment = Alignment.Center,
-        isRefreshing = debtors is DebtUiState.Loading,
+        isRefreshing = refresh,
         onRefresh = {
             debtorsFeedViewModel.loadAllDebts()
         },
@@ -404,7 +404,7 @@ fun DebtorsFeedScreen(
                                 indication = null,
                                 interactionSource = null
                             ) {
-                                debtorsFeedViewModel.loadAllDebts()
+                                debtorsFeedViewModel.loadAllDebts(false)
                             },
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
@@ -481,7 +481,6 @@ fun DebtorsFeedScreen(
 
         if (showBottomSheet) {
             ModalBottomSheet(
-                modifier = Modifier,
                 onDismissRequest = {
                     showBottomSheet = false
                     editedDebt = null
@@ -507,15 +506,32 @@ fun DebtorsFeedScreen(
                             )
                             showBottomSheet = false
                         } else {
-                            debtorsFeedViewModel.createDebt(
-                                name = it.name,
-                                isMine = it.isMine,
-                                telegramNick = it.telegramNick,
-                                debtAmount = it.debtAmount,
-                                returnDate = it.returnDate,
-                                comment = it.comment,
-                            )
-                            showBottomSheet = false
+
+                            if (it.telegramNick.isNullOrEmpty()) {
+                                debtorsFeedViewModel.createDebt(
+                                    name = it.name,
+                                    isMine = it.isMine,
+                                    telegramNick = it.telegramNick,
+                                    debtAmount = it.debtAmount,
+                                    returnDate = it.returnDate,
+                                    comment = it.comment,
+                                )
+                                showBottomSheet = false
+                            } else {
+                                if (it.telegramNick.validateTelegram()) {
+                                    debtorsFeedViewModel.createDebt(
+                                        name = it.name,
+                                        isMine = it.isMine,
+                                        telegramNick = it.telegramNick,
+                                        debtAmount = it.debtAmount,
+                                        returnDate = it.returnDate,
+                                        comment = it.comment,
+                                    )
+                                    showBottomSheet = false
+                                } else {
+                                    debtorsFeedViewModel. showError("nickname  not valid")
+                                }
+                            }
                         }
                         editedDebt = null
                     }

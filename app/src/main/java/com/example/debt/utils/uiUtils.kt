@@ -19,13 +19,12 @@ import androidx.navigation.toRoute
 class DateVisualTransformation : VisualTransformation {
 
     override fun filter(text: AnnotatedString): TransformedText {
-
-        val digits = text.text
+        val cleanDigits = text.text.filter { it.isDigit() }.take(8)
 
         val formatted = buildString {
-            for (i in digits.indices) {
-                append(digits[i])
-                if ((i == 1 || i == 3) && i != digits.lastIndex) {
+            for (i in cleanDigits.indices) {
+                append(cleanDigits[i])
+                if ((i == 1 || i == 3) && i != cleanDigits.lastIndex) {
                     append(".")
                 }
             }

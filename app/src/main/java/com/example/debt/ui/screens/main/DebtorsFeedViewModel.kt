@@ -1,5 +1,7 @@
 package com.example.debt.ui.screens.main
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.debt.app.data.repo.DebtRepository
@@ -8,8 +10,8 @@ import com.example.debt.data.model.Debt
 import com.example.debt.data.model.request.DebtRequest
 import com.example.debt.data.model.request.DebtUpdateRequest
 import com.example.debt.data.model.request.TransactionRequest
+import com.example.debt.utils.AlertManager
 import com.example.debt.utils.getCurrentDateTime
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -21,7 +23,8 @@ sealed class DebtUiState {
 }
 
 class DebtorsFeedViewModel(
-    private val repository: DebtRepository
+    private val repository: DebtRepository,
+    private val alertManager: AlertManager
 ) : ViewModel() {
 
     private val _debtors = MutableStateFlow<DebtUiState>(DebtUiState.Loading)
@@ -30,52 +33,39 @@ class DebtorsFeedViewModel(
     private val _debtor = MutableStateFlow<Debt?>(null)
     val debtor = _debtor.asStateFlow()
 
+    private val _refresh = MutableStateFlow<Boolean>(false)
+    val refresh = _refresh.asStateFlow()
+
     init {
-        loadAllDebts()
+        loadAllDebts(false)
     }
 
-    fun loadAllDebts() {
+    fun showError(text: String, onActionClick: (() -> Unit)? = null) {
+        alertManager.showError(text, onActionClick)
+    }
+
+    fun showInfo(text: String, onActionClick: (() -> Unit)? = null) {
+        alertManager.showInfo(text, onActionClick)
+    }
+
+    fun loadAllDebts(refreshing: Boolean = true) {
         viewModelScope.launch {
-            _debtors.value = DebtUiState.Loading
-            delay(1500)
+            if (refreshing) _refresh.value = true else _debtors.value = DebtUiState.Loading
 
             try {
                 repository.getAllDebts().collect { debts ->
                     _debtors.value = DebtUiState.Success(debts)
+                    _refresh.value = false
                 }
-
-//                val emptyList = listOf<Debt>()
-//                val list = List(12) {
-//                    Debt(
-//                        id = "id_${it}_${Random.nextInt(1000, 9999)}",
-//                        name = listOf("Алексей", "Мария", "Иван", "Елена", "Дмитрий", "Анна", "Сергей", "Ольга", "Павел", "Татьяна").random(),
-//                        isMine = Random.nextBoolean(),
-//                        telegramNick = null,
-//                        debtAmount = 10000.0,
-//                        comment = listOf("За обед", "За билеты", "За подарок", "Долг", "Возврат", "").random(),
-//                        transactions = listOf()
-//                        transactions = List(Random.nextInt(1)) { index ->
-//                            Transaction(
-//                                id = "trans_${it}_${index}_${Random.nextInt(1000)}",
-//                                amount = Random.nextDouble(50.0, 1000.0).let { String.format("%.2f", it).toDouble() },
-//                                date = "2024-${Random.nextInt(1, 13)}-${Random.nextInt(1, 29)}",
-//                                type = if (Random.nextBoolean()) TransactionType.PAYMENT else TransactionType.DEBT,
-//                                comment = listOf("Частичный возврат", "Полный расчёт", "Аванс", "").random()
-//                            )
-//                        }
-//                    )
-//                }
-
-//                _debtors.value = DebtUiState.Success(list)
-//                _debtors.value = DebtUiState.Success(emptList)
-
             } catch (e: Exception) {
+                _refresh.value = false
                 _debtors.value = DebtUiState.Error(e.message ?: "loadAllDebts error")
                 errorLog(e.message ?: "loadAllDebts error")
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun createDebt(
         name: String,
         isMine: Boolean,
@@ -85,7 +75,7 @@ class DebtorsFeedViewModel(
         comment: String?
     ) {
         viewModelScope.launch {
-            _debtors.value = DebtUiState.Loading
+            _refresh.value = true
 
             val request = DebtRequest(
                 name = name,
@@ -107,55 +97,39 @@ class DebtorsFeedViewModel(
                 repository.createDebt(request)
                 loadAllDebts()
             } catch (e: Exception) {
-                _debtors.value = DebtUiState.Error(e.message ?: "createDebt Error")
+                showError(e.message ?: "Error")
+                _refresh.value = false
+                errorLog(e)
             }
         }
     }
 
     fun payDebt(debtorId: String, paymentAmount: Double) {
         viewModelScope.launch {
-            _debtors.value = DebtUiState.Loading
+            _refresh.value = true
 
             try {
-                repository.payDebt(debtorId, paymentAmount)
+                val paid = repository.payDebt(debtorId, paymentAmount)
+                if (paid) showInfo("your debt is paid")
                 loadAllDebts()
             } catch (e: Exception) {
-                _debtors.value = DebtUiState.Error(e.message ?: "payDebt Error")
+                showError(e.message ?: "Error")
+                _refresh.value = false
+                errorLog(e)
             }
         }
     }
 
     fun addDebt(debtorId: String, additionalAmount: Double) {
         viewModelScope.launch {
-            _debtors.value = DebtUiState.Loading
-
+            _refresh.value = true
             try {
                 repository.addDebt(debtorId, additionalAmount)
                 loadAllDebts()
             } catch (e: Exception) {
-                _debtors.value = DebtUiState.Error(e.message ?: "addDebt Error")
+                showError(e.message ?: "Error")
+                errorLog(e)
             }
-        }
-    }
-
-    private fun updateDebtList(updatedDebts: List<Debt>) {
-        val currentState = _debtors.value
-        if (currentState is DebtUiState.Success) {
-            val currentDebts = currentState.debtors.toMutableList()
-
-            updatedDebts.forEach { updatedDebt ->
-                val existingIndex = currentDebts.indexOfFirst { it.id == updatedDebt.id }
-
-                if (existingIndex != -1) {
-                    currentDebts[existingIndex] = updatedDebt
-                } else {
-                    currentDebts.add(updatedDebt)
-                }
-            }
-
-            _debtors.value = DebtUiState.Success(currentDebts)
-        } else {
-            _debtors.value = DebtUiState.Success(updatedDebts)
         }
     }
 
@@ -169,7 +143,7 @@ class DebtorsFeedViewModel(
         comment: String? = null
     ) {
         viewModelScope.launch {
-            _debtors.value = DebtUiState.Loading
+            _refresh.value = true
 
             val request = DebtUpdateRequest(
                 name = name,
@@ -184,20 +158,24 @@ class DebtorsFeedViewModel(
                 repository.updateDebt(id, request)
                 loadAllDebts()
             } catch (e: Exception) {
-                _debtors.value = DebtUiState.Error(e.message ?: "updateDebt Error")
+                showError(e.message ?: "Error")
+                _refresh.value = false
+                errorLog(e)
             }
         }
     }
 
     fun deleteDebtor(id: String) {
         viewModelScope.launch {
-            _debtors.value = DebtUiState.Loading
+            _refresh.value = true
 
             try {
                 repository.deleteDebt(id)
                 loadAllDebts()
             } catch (e: Exception) {
-                _debtors.value = DebtUiState.Error(e.message ?: "deleteDebtor Error")
+                showError(e.message ?: "Error")
+                _refresh.value = false
+                errorLog(e)
             }
         }
     }
@@ -207,7 +185,8 @@ class DebtorsFeedViewModel(
             try {
                 _debtor.value = repository.getDebtById(id)
             } catch (e: Exception) {
-                _debtors.value = DebtUiState.Error(e.message ?: "getDebtorById Error")
+                showError(e.message ?: "Error")
+                errorLog(e)
             }
         }
     }

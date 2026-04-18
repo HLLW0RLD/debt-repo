@@ -50,6 +50,16 @@ fun getCurrentDateTime(utc: Boolean = false): String {
     }
 }
 
+fun String?.validateTelegram(): Boolean {
+    val username = this ?: ""
+        .trim()
+        .removePrefix("@")
+
+    val regex = Regex("^(?!.*__)[a-zA-Z][a-zA-Z0-9_]{4,31}$")
+
+    return regex.matches(username)
+}
+
 fun String.openTelegramChat() {
     val context = App.appInstance
     val nick = this.replace("@", "")
