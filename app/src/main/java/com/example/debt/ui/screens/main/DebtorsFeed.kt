@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -46,6 +47,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -69,6 +71,7 @@ import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.DebtDialog
 import com.example.debt.ui.screens.main.DebtUiState
 import com.example.debt.ui.screens.main.DebtorsFeedViewModel
+import com.example.debt.ui.screens.main.FilterType
 import com.example.debt.ui.screens.settings.Settings
 import com.example.debt.ui.theme.AppColors
 import com.example.debt.utils.PreferenceCache
@@ -103,6 +106,8 @@ fun DebtorsFeedScreen(
     var isMineDebtsState by remember { mutableStateOf(false) }
 
     var editedDebtorBGcolor by remember { mutableStateOf<Color?>(null) }
+
+    var currentFilter  by remember { mutableStateOf(FilterType.ACTIVE) }
 
     val tabs = listOf(
         stringResource(R.string.tab_all),
@@ -186,42 +191,57 @@ fun DebtorsFeedScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
+                    .padding(start = 16.dp)
                     .background(AppColors.background)
                     .fillMaxWidth(),
             ) {
+                Text(
+                    text = stringResource(R.string.debt_title),
+                    fontSize = 24.sp,
+                    color = AppColors.textPrimary,
+                    fontWeight = FontWeight.Bold,
+                )
+
                 Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .background(AppColors.background),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
-                        onClick = {
-                            // pro version
-                        }
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(AppColors.surface)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                currentFilter = nextFilter(currentFilter)
+                            }
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Text(
+                            text = getFilterText(currentFilter),
+                            color = AppColors.textPrimary,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Icon(
-                            painter = painterResource(R.drawable.ic_trade),
-                            tint = AppColors.accentPrimary,
+                            painter = painterResource(R.drawable.ic_double_arrow_down),
+                            contentDescription = "",
+                            modifier = Modifier.size(18.dp),
+                            tint = AppColors.accentPrimary
+                        )
+                    }
+
+                    IconButton(onClick = {
+                        navController.navigate(Settings)
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.gear),
+                            tint = AppColors.textPrimary,
                             contentDescription = "",
                         )
                     }
-                    Text(
-                        text = stringResource(R.string.debt_title),
-                        fontSize = 24.sp,
-                        color = AppColors.textPrimary,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-                IconButton(onClick = {
-                    navController.navigate(Settings)
-                }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.gear),
-                        tint = AppColors.textPrimary,
-                        contentDescription = "",
-                    )
                 }
             }
 
@@ -327,6 +347,12 @@ fun DebtorsFeedScreen(
                                 1 -> data.filter { !it.isMine }
                                 2 -> data.filter { it.isMine }
                                 else -> data
+                            }.filter { debtor ->
+                                when (currentFilter) {
+                                    FilterType.ACTIVE -> debtor.debtAmount > 0
+                                    FilterType.PAID -> debtor.debtAmount == 0.0
+                                    FilterType.ALL -> true
+                                }
                             }
 
                             LazyColumn(
@@ -539,5 +565,22 @@ fun DebtorsFeedScreen(
             }
         }
 
+    }
+}
+
+@Composable
+fun getFilterText(filter: FilterType): String {
+    return when (filter) {
+        FilterType.ALL -> stringResource(R.string.tab_all)
+        FilterType.ACTIVE -> stringResource(R.string.active)
+        FilterType.PAID -> stringResource(R.string.paid)
+    }
+}
+
+fun nextFilter(currentFilter: FilterType): FilterType {
+    return when (currentFilter) {
+        FilterType.ALL -> FilterType.ACTIVE
+        FilterType.ACTIVE -> FilterType.PAID
+        FilterType.PAID -> FilterType.ALL
     }
 }

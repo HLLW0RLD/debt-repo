@@ -2,6 +2,8 @@
     <string name="app_name">debt</string>
 
     <string name="debt_title">Debtor</string>
+    <string name="active">Активные</string>
+    <string name="paid">Оплачено</string>
     <string name="tab_all">Все</string>
     <string name="tab_owe_me">Получу</string>
     <string name="tab_i_owe">Отдам</string>
@@ -51,5 +53,6 @@
     <string name="save_button">Сохранить</string>
     <string name="confirm_button">Подтвердить</string>
     <string name="cancel_button">Отмена</string>
+    <string name="app_version">Версия приложения: </string>
 
 </resources>

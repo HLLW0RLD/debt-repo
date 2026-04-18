@@ -3,11 +3,13 @@ package com.example.debt.ui.screens.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -16,8 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,119 +46,137 @@ fun SettingsScreen(
     val navController = LocalNavController.current
 
     val debtAutoCount by settingsViewModel.autoCountDebts.collectAsState()
-    val debtAutoDelete by settingsViewModel.debtAutoDelete.collectAsState()
     val selectedTheme by settingsViewModel.selectedTheme.collectAsState()
 
-    Column(
+    val context = LocalContext.current
+    val versionName = remember {
+        try {
+            val packageName = context.packageManager.getPackageInfo(context.packageName, 0)
+            packageName.versionName
+        } catch (e: Exception) {
+            "1.0"
+        }
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(AppColors.background)
     ) {
-        Spacer(Modifier.size(50.dp))
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
             modifier = Modifier
+                .align(Alignment.TopCenter)
                 .background(AppColors.background)
-                .fillMaxWidth(),
-        ) {
-            IconButton(
-                onClick = {
-                    navController.popBackStack()
-                }
+        )
+        {
+            Spacer(Modifier.size(50.dp))
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .background(AppColors.background)
+                    .fillMaxWidth(),
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back),
-                    tint = AppColors.textPrimary,
-                    contentDescription = "",
+                IconButton(
+                    onClick = {
+                        navController.popBackStack()
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_back),
+                        tint = AppColors.textPrimary,
+                        contentDescription = "",
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.settings_title),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.textPrimary,
                 )
             }
-            Text(
-                text = stringResource(R.string.settings_title),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = AppColors.textPrimary,
-            )
-        }
 
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.theme_selection),
-                color = AppColors.textPrimary,
+            Column(
                 modifier = Modifier.padding(8.dp)
-            )
+            ) {
+                Text(
+                    text = stringResource(R.string.theme_selection),
+                    color = AppColors.textPrimary,
+                    modifier = Modifier.padding(8.dp)
+                )
 
-            ThemeOption(
-                text = stringResource(R.string.theme_system),
-                selected = selectedTheme == ThemeMode.SYSTEM,
-                onClick = {
-                    settingsViewModel.setTheme(ThemeMode.SYSTEM)
-                }
-            )
+                ThemeOption(
+                    text = stringResource(R.string.theme_system),
+                    selected = selectedTheme == ThemeMode.SYSTEM,
+                    onClick = {
+                        settingsViewModel.setTheme(ThemeMode.SYSTEM)
+                    }
+                )
 
-            ThemeOption(
-                text = stringResource(R.string.theme_light),
-                selected = selectedTheme == ThemeMode.LIGHT,
-                onClick = {
-                    settingsViewModel.setTheme(ThemeMode.LIGHT)
-                }
-            )
+                ThemeOption(
+                    text = stringResource(R.string.theme_light),
+                    selected = selectedTheme == ThemeMode.LIGHT,
+                    onClick = {
+                        settingsViewModel.setTheme(ThemeMode.LIGHT)
+                    }
+                )
 
-            ThemeOption(
-                text = stringResource(R.string.theme_dark),
-                selected = selectedTheme == ThemeMode.DARK,
-                onClick = {
-                    settingsViewModel.setTheme(ThemeMode.DARK)
-                }
-            )
+                ThemeOption(
+                    text = stringResource(R.string.theme_dark),
+                    selected = selectedTheme == ThemeMode.DARK,
+                    onClick = {
+                        settingsViewModel.setTheme(ThemeMode.DARK)
+                    }
+                )
 
-            ThemeOption(
-                text = stringResource(R.string.theme_colored),
-                selected = selectedTheme == ThemeMode.COLOR,
-                onClick = {
-                    settingsViewModel.setTheme(ThemeMode.COLOR)
-                }
-            )
-        }
+                ThemeOption(
+                    text = stringResource(R.string.theme_colored),
+                    selected = selectedTheme == ThemeMode.COLOR,
+                    onClick = {
+                        settingsViewModel.setTheme(ThemeMode.COLOR)
+                    }
+                )
+            }
 
-        Spacer(Modifier.size(16.dp))
+            Spacer(Modifier.size(16.dp))
 
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.debt_calculation),
-                color = AppColors.textPrimary,
+            Column(
                 modifier = Modifier.padding(8.dp)
-            )
+            ) {
+                Text(
+                    text = stringResource(R.string.debt_calculation),
+                    color = AppColors.textPrimary,
+                    modifier = Modifier.padding(8.dp)
+                )
 
-            ThemeOption(
-                text = stringResource(R.string.auto_delete_paid_debts),
-                selected = debtAutoDelete,
-                onClick = {
-                    settingsViewModel.debtAutoDelete(true)
-                }
-            )
+                ThemeOption(
+                    text = stringResource(R.string.auto_calculate_overpayments),
+                    selected = debtAutoCount,
+                    onClick = {
+                        settingsViewModel.debtAutoCount(true)
+                    }
+                )
 
-            ThemeOption(
-                text = stringResource(R.string.auto_calculate_overpayments),
-                selected = debtAutoCount,
-                onClick = {
-                    settingsViewModel.debtAutoCount(true)
-                }
-            )
-
-            ThemeOption(
-                text = stringResource(R.string.nothing),
-                selected = !debtAutoCount && !debtAutoDelete,
-                onClick = {
-                    settingsViewModel.debtAutoCount(false)
-                    settingsViewModel.debtAutoDelete(false)
-                }
-            )
+                ThemeOption(
+                    text = stringResource(R.string.nothing),
+                    selected = !debtAutoCount,
+                    onClick = {
+                        settingsViewModel.debtAutoCount(false)
+                    }
+                )
+            }
         }
+
+        val verText = stringResource(R.string.app_version)
+        Text(
+            text = verText + " $versionName",
+            fontSize = 14.sp,
+            color = AppColors.textSecondary,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .navigationBarsPadding()
+                .padding(16.dp)
+        )
     }
 }
 

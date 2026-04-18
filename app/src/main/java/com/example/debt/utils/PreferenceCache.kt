@@ -42,9 +42,4 @@ object PreferenceCache {
         get() { return prefs.getBoolean(AUTO_SETTLE_DEBTS, true) }
         set(value) { prefs.edit().putBoolean(AUTO_SETTLE_DEBTS, value )?.apply() }
 
-    @set:Synchronized
-    var autoDeleteEmptyDebts: Boolean
-        get() { return prefs.getBoolean(AUTO_DELETE_EMPTY_DEBTS, true) }
-        set(value) { prefs.edit().putBoolean(AUTO_DELETE_EMPTY_DEBTS, value )?.apply() }
-
 }

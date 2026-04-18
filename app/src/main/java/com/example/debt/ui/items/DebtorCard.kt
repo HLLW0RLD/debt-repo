@@ -42,6 +42,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.debt.R
 import com.example.debt.data.model.Debt
@@ -112,6 +114,8 @@ fun DebtorCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
+                    modifier = Modifier
+                        .weight(2f),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -123,10 +127,15 @@ fun DebtorCard(
                     )
                     Spacer(Modifier.size(4.dp))
                     Text(
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         text = debt.name,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = AppColors.textPrimary
+                        color = AppColors.textPrimary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Start
                     )
                 }
                 Icon(
@@ -142,6 +151,8 @@ fun DebtorCard(
                         ) { onDeleteDebtorClick(debt) }
                 )
             }
+
+            Spacer(modifier = Modifier.size(4.dp))
 
             Row(
                 modifier = Modifier

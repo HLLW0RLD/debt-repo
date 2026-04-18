@@ -16,6 +16,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+enum class FilterType {
+    ALL,
+    ACTIVE,
+    PAID
+}
+
 sealed class DebtUiState {
     object Loading : DebtUiState()
     data class Success(val debtors: List<Debt>) : DebtUiState()

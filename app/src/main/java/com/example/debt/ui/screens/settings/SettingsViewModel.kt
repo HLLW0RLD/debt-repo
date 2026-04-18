@@ -12,17 +12,9 @@ class SettingsViewModel : ViewModel(), KoinComponent {
     private val _autoCountDebts = MutableStateFlow<Boolean>(PreferenceCache.autoCountDebts)
     val autoCountDebts = _autoCountDebts.asStateFlow()
 
-    private val _debtAutoDelete = MutableStateFlow<Boolean>(PreferenceCache.autoDeleteEmptyDebts)
-    val debtAutoDelete = _debtAutoDelete.asStateFlow()
-
     private val _selectedTheme = MutableStateFlow<ThemeMode>(PreferenceCache.selectedTheme)
     val selectedTheme = _selectedTheme.asStateFlow()
 
-
-    fun debtAutoDelete(v: Boolean) {
-        PreferenceCache.autoDeleteEmptyDebts = v
-        _debtAutoDelete.value = v
-    }
 
     fun debtAutoCount(v: Boolean) {
         PreferenceCache.autoCountDebts = v
