@@ -11,15 +11,4 @@ interface UserApi {
     // user/settings -- через слеш для расширения и получения других данныхх юзера, например api/user/subscription
 
 
-    @GET("api/user/settings")
-    suspend fun getUserSettings(
-        @Body request: DebtRequest
-    ): Response<Unit>
-
-
-    @POST("api/user/settings")
-    suspend fun updateUserSettings(
-        @Body request: DebtRequest
-    ): Response<Unit>
-
 }

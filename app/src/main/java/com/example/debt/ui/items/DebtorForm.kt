@@ -81,6 +81,8 @@ fun DebtorForm(
             value = name.value,
             onValueChange = { name.value = it },
             label = stringResource(R.string.label_name_debt),
+            maxCharacters = 20,
+            showCharacterCounter = true,
         )
 
         Row(
@@ -113,6 +115,8 @@ fun DebtorForm(
             value = telegramNick.value,
             onValueChange = { telegramNick.value = it },
             label = stringResource(R.string.label_telegram_nick),
+            maxCharacters = 20,
+            showCharacterCounter = true,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -132,7 +136,9 @@ fun DebtorForm(
                     .replace("-", "")
             },
             label = stringResource(R.string.label_debt_amount),
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.Number,
+            maxCharacters = 20,
+            showCharacterCounter = true,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -161,6 +167,8 @@ fun DebtorForm(
             value = comment.value,
             onValueChange = { comment.value = it },
             label = stringResource(R.string.label_comment_optional),
+            maxCharacters = 100,
+            showCharacterCounter = true,
         )
 
         Spacer(modifier = Modifier.height(16.dp))

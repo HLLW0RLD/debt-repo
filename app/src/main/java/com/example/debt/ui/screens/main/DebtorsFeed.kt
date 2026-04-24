@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -47,7 +46,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -67,6 +65,7 @@ import com.example.debt.app.ui.items.DebtorCard
 import com.example.debt.app.ui.items.DebtorForm
 import com.example.debt.app.utils.LogUtils.debugLog
 import com.example.debt.ui.items.AnimatedFloatingActionButton
+import com.example.debt.ui.items.CustomFilterDropdown
 import com.example.debt.ui.items.PaymentDialog
 import com.example.debt.ui.items.DebtDialog
 import com.example.debt.ui.screens.main.DebtUiState
@@ -203,35 +202,15 @@ fun DebtorsFeedScreen(
                 )
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(AppColors.surface)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                currentFilter = nextFilter(currentFilter)
-                            }
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = getFilterText(currentFilter),
-                            color = AppColors.textPrimary,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Icon(
-                            painter = painterResource(R.drawable.ic_double_arrow_down),
-                            contentDescription = "",
-                            modifier = Modifier.size(18.dp),
-                            tint = AppColors.accentPrimary
-                        )
-                    }
+                    CustomFilterDropdown(
+                        currentFilter = currentFilter,
+                        onFilterSelected = { newFilter ->
+                            currentFilter = newFilter
+                        }
+                    )
 
                     IconButton(onClick = {
                         navController.navigate(Settings)

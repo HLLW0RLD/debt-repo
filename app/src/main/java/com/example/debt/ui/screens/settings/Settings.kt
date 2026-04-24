@@ -45,7 +45,6 @@ fun SettingsScreen(
 
     val navController = LocalNavController.current
 
-    val debtAutoCount by settingsViewModel.autoCountDebts.collectAsState()
     val selectedTheme by settingsViewModel.selectedTheme.collectAsState()
 
     val context = LocalContext.current
@@ -139,32 +138,6 @@ fun SettingsScreen(
             }
 
             Spacer(Modifier.size(16.dp))
-
-            Column(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.debt_calculation),
-                    color = AppColors.textPrimary,
-                    modifier = Modifier.padding(8.dp)
-                )
-
-                ThemeOption(
-                    text = stringResource(R.string.auto_calculate_overpayments),
-                    selected = debtAutoCount,
-                    onClick = {
-                        settingsViewModel.debtAutoCount(true)
-                    }
-                )
-
-                ThemeOption(
-                    text = stringResource(R.string.nothing),
-                    selected = !debtAutoCount,
-                    onClick = {
-                        settingsViewModel.debtAutoCount(false)
-                    }
-                )
-            }
         }
 
         val verText = stringResource(R.string.app_version)
