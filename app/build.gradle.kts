@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.debt"
         minSdk = 25
         targetSdk = 35
-        versionCode = 8
-        versionName = "5.2"
+        versionCode = 9
+        versionName = "5.3" // 6.0 после добавления юзеров
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
