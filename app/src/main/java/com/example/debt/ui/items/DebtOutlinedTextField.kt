@@ -162,8 +162,3 @@ fun CharacterCounter(
         )
     }
 }
-
-enum class CharacterCounterPosition {
-    BELOW,
-    INSIDE
-}

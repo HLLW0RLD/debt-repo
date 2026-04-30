@@ -21,6 +21,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 val LENGTH_LONG = Toast.LENGTH_LONG
 val LENGTH_SHORT = Toast.LENGTH_SHORT
@@ -58,6 +60,17 @@ fun String?.validateTelegram(): Boolean {
     val regex = Regex("^(?!.*__)[a-zA-Z][a-zA-Z0-9_]{4,31}$")
 
     return regex.matches(username)
+}
+
+fun isValidEmail(email: String): Boolean {
+    var isValid = false
+    val expression = "^[a-zA-Z0-9+_.-]+@[a-z]+\\.+[a-z]+"
+    val pattern: Pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
+    val matcher: Matcher = pattern.matcher(email)
+    if (matcher.matches()) {
+        isValid = true
+    }
+    return isValid
 }
 
 fun String.openTelegramChat() {

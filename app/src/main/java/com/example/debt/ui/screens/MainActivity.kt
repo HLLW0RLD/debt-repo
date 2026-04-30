@@ -17,6 +17,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.debt.app.ui.screens.DebtorsFeed
 import com.example.debt.app.ui.screens.DebtorsFeedScreen
+import com.example.debt.ui.screens.login.Login
+import com.example.debt.ui.screens.login.LoginScreen
 import com.example.debt.ui.screens.settings.Settings
 import com.example.debt.ui.screens.settings.SettingsScreen
 import com.example.debt.ui.theme.AppTheme
@@ -41,8 +43,13 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = DebtorsFeed
+                            startDestination = Login
                         ) {
+                            animatedComposable<Login>(
+                                navController = navController
+                            ) {
+                                LoginScreen()
+                            }
                             animatedComposable<DebtorsFeed>(
                                 navController = navController
                             ) {

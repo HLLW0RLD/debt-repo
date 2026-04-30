@@ -66,8 +66,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .background(AppColors.background)
-        )
-        {
+        ) {
             Spacer(Modifier.size(50.dp))
             Row(
                 horizontalArrangement = Arrangement.Start,
